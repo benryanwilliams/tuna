@@ -1,0 +1,113 @@
+//
+//  YoutubeSpotifyHeaderView.swift
+//  Tuna
+//
+//  Created by Ben Williams on 07/12/2020.
+//  Copyright © 2020 Ben Williams. All rights reserved.
+//
+
+import UIKit
+
+protocol YoutubeSpotifyHeaderViewDelegate: AnyObject {
+    func didTapYoutubeButton()
+    func didTapSpotifyButton()
+}
+
+class YoutubeSpotifyHeaderView: UIView {
+    
+    weak var delegate: YoutubeSpotifyHeaderViewDelegate?
+    
+    private let youtubeButton: UIButton = {
+        let button = UIButton()
+        button.clipsToBounds = true
+        button.backgroundColor = .systemBackground
+        button.setImage(UIImage(named: "youtubeNotPressed"), for: .normal)
+        button.setImage(UIImage(named: "youtubePressed"), for: .selected)
+        button.isSelected = true
+        button.alpha = 1.0
+        button.adjustsImageWhenHighlighted = false
+        button.contentEdgeInsets = UIEdgeInsets(top: 5, left: 30, bottom: 5, right: 30)
+        button.imageView?.contentMode = .scaleAspectFit
+        
+        return button
+    }()
+    
+    private let spotifyButton: UIButton = {
+        let button = UIButton()
+        button.clipsToBounds = true
+        button.backgroundColor = .secondarySystemBackground
+        button.setImage(UIImage(named: "spotifyNotPressed"), for: .normal)
+        button.setImage(UIImage(named: "spotifyPressed"), for: .selected)
+        button.alpha = 0.75
+        button.adjustsImageWhenHighlighted = false
+        button.contentEdgeInsets = UIEdgeInsets(top: 5, left: 30, bottom: 5, right: 30)
+        button.imageView?.contentMode = .scaleAspectFit
+        
+        return button
+    }()
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        
+        youtubeButton.addTarget(self, action: #selector(didTapYoutubeButton), for: .touchUpInside)
+        spotifyButton.addTarget(self, action: #selector(didTapSpotifyButton), for: .touchUpInside)
+        
+        addSubview(youtubeButton)
+        addSubview(spotifyButton)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    @objc private func didTapYoutubeButton() {
+        youtubeButton.isSelected = true
+        youtubeButton.isHighlighted = false
+        youtubeButton.backgroundColor = .systemBackground
+        youtubeButton.alpha = 1
+        
+        spotifyButton.isSelected = false
+        spotifyButton.backgroundColor = .secondarySystemBackground
+        spotifyButton.alpha = 0.75
+        
+        delegate?.didTapYoutubeButton()
+    }
+    
+    @objc private func didTapSpotifyButton() {
+        spotifyButton.isSelected = true
+        spotifyButton.isHighlighted = false
+        spotifyButton.backgroundColor = .systemBackground
+        spotifyButton.alpha = 1
+        
+        youtubeButton.isSelected = false
+        youtubeButton.backgroundColor = .secondarySystemBackground
+        youtubeButton.alpha = 0.75
+        
+        delegate?.didTapSpotifyButton()
+    }
+    
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        youtubeButton.frame = CGRect(
+            x: 3,
+            y: 3,
+            width: (width / 2) - 6,
+            height: 44
+        )
+        youtubeButton.layer.cornerRadius = 4.0
+        
+        spotifyButton.frame = CGRect(
+            x: youtubeButton.right + 3,
+            y: 3,
+            width: (width / 2) - 6,
+            height: 44
+        )
+        spotifyButton.layer.cornerRadius = 4.0
+    }
+    
+    
+    
+    
+}
