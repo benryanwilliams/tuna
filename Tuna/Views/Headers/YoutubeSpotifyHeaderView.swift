@@ -26,8 +26,9 @@ class YoutubeSpotifyHeaderView: UIView {
         button.isSelected = true
         button.alpha = 1.0
         button.adjustsImageWhenHighlighted = false
-        button.contentEdgeInsets = UIEdgeInsets(top: 5, left: 30, bottom: 5, right: 30)
+        button.contentEdgeInsets = UIEdgeInsets(top: 10, left: -3, bottom: 10, right: 30)
         button.imageView?.contentMode = .scaleAspectFit
+        button.isUserInteractionEnabled = false
         
         return button
     }()
@@ -40,7 +41,7 @@ class YoutubeSpotifyHeaderView: UIView {
         button.setImage(UIImage(named: "spotifyPressed"), for: .selected)
         button.alpha = 0.75
         button.adjustsImageWhenHighlighted = false
-        button.contentEdgeInsets = UIEdgeInsets(top: 5, left: 30, bottom: 5, right: 30)
+        button.contentEdgeInsets = UIEdgeInsets(top: 5, left: 0, bottom: 3, right: 30)
         button.imageView?.contentMode = .scaleAspectFit
         
         return button
@@ -65,12 +66,16 @@ class YoutubeSpotifyHeaderView: UIView {
         youtubeButton.isHighlighted = false
         youtubeButton.backgroundColor = .systemBackground
         youtubeButton.alpha = 1
+        youtubeButton.isUserInteractionEnabled = false
         
         spotifyButton.isSelected = false
         spotifyButton.backgroundColor = .secondarySystemBackground
         spotifyButton.alpha = 0.75
+        spotifyButton.isUserInteractionEnabled = true
         
         delegate?.didTapYoutubeButton()
+        
+        
     }
     
     @objc private func didTapSpotifyButton() {
@@ -78,10 +83,12 @@ class YoutubeSpotifyHeaderView: UIView {
         spotifyButton.isHighlighted = false
         spotifyButton.backgroundColor = .systemBackground
         spotifyButton.alpha = 1
+        spotifyButton.isUserInteractionEnabled = false
         
         youtubeButton.isSelected = false
         youtubeButton.backgroundColor = .secondarySystemBackground
         youtubeButton.alpha = 0.75
+        youtubeButton.isUserInteractionEnabled = true
         
         delegate?.didTapSpotifyButton()
     }
@@ -96,7 +103,8 @@ class YoutubeSpotifyHeaderView: UIView {
             width: (width / 2) - 6,
             height: 44
         )
-        youtubeButton.layer.cornerRadius = 4.0
+        youtubeButton.layer.cornerRadius = 8.0
+        youtubeButton.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMinYCorner]
         
         spotifyButton.frame = CGRect(
             x: youtubeButton.right + 3,
@@ -104,7 +112,8 @@ class YoutubeSpotifyHeaderView: UIView {
             width: (width / 2) - 6,
             height: 44
         )
-        spotifyButton.layer.cornerRadius = 4.0
+        spotifyButton.layer.cornerRadius = 8.0
+        spotifyButton.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMinYCorner]
     }
     
     

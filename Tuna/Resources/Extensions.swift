@@ -15,7 +15,7 @@ extension UIView {
     }
     
     public var height: CGFloat {
-        return frame.size.width
+        return frame.size.height
     }
     
     public var top: CGFloat {

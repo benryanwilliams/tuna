@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "Spotify_Logo_RGB_Green-1.png",
+      "filename" : "AGAINSpotify_Logo_RGB_Green.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
@@ -12,7 +12,7 @@
           "value" : "dark"
         }
       ],
-      "filename" : "Spotify_Logo_RGB_Green.png",
+      "filename" : "AGAINSpotify_Logo_RGB_Green-1.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
