@@ -20,6 +20,8 @@
 		637E9BB7257CFD03004A9864 /* SpotifyLoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637E9BB6257CFD03004A9864 /* SpotifyLoginViewController.swift */; };
 		637E9BBB257D4620004A9864 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637E9BBA257D4620004A9864 /* Extensions.swift */; };
 		637E9BBF257D6043004A9864 /* YoutubeSpotifyHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637E9BBE257D6043004A9864 /* YoutubeSpotifyHeaderView.swift */; };
+		638E5EDB257FD2D600C2D453 /* Secrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 638E5EDA257FD2D600C2D453 /* Secrets.swift */; };
+		63DADEF2257FD579009D9105 /* SecretsTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63DADEF1257FD579009D9105 /* SecretsTemplate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +40,8 @@
 		637E9BB6257CFD03004A9864 /* SpotifyLoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyLoginViewController.swift; sourceTree = "<group>"; };
 		637E9BBA257D4620004A9864 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		637E9BBE257D6043004A9864 /* YoutubeSpotifyHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YoutubeSpotifyHeaderView.swift; sourceTree = "<group>"; };
+		638E5EDA257FD2D600C2D453 /* Secrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Secrets.swift; sourceTree = "<group>"; };
+		63DADEF1257FD579009D9105 /* SecretsTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecretsTemplate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -133,6 +137,8 @@
 				635D9497257CF49800974B78 /* AppDelegate.swift */,
 				635D9499257CF49800974B78 /* SceneDelegate.swift */,
 				637E9BBA257D4620004A9864 /* Extensions.swift */,
+				638E5EDA257FD2D600C2D453 /* Secrets.swift */,
+				63DADEF1257FD579009D9105 /* SecretsTemplate.swift */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -244,11 +250,13 @@
 				635D9498257CF49800974B78 /* AppDelegate.swift in Sources */,
 				637E9BBF257D6043004A9864 /* YoutubeSpotifyHeaderView.swift in Sources */,
 				637E9BBB257D4620004A9864 /* Extensions.swift in Sources */,
+				63DADEF2257FD579009D9105 /* SecretsTemplate.swift in Sources */,
 				635D94B1257CF83100974B78 /* ProfileViewController.swift in Sources */,
 				635D94AF257CF81E00974B78 /* LibraryViewController.swift in Sources */,
 				637E9BB7257CFD03004A9864 /* SpotifyLoginViewController.swift in Sources */,
 				635D949A257CF49800974B78 /* SceneDelegate.swift in Sources */,
 				6379254F257E7A1100B096F8 /* SearchTableViewCell.swift in Sources */,
+				638E5EDB257FD2D600C2D453 /* Secrets.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
