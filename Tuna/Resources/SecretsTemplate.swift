@@ -8,7 +8,7 @@
 
 import Foundation
 
-// Rename the struct and filename to be 'Secrets.swift' and insert your API key below to use
+// Rename the struct and filename to 'Secrets.swift' and insert your API key below to use YouTube APIs
 struct SecretsTemplate {
     static let youtubeAPIKey = "[Insert YouTube API Key here]"
 }

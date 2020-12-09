@@ -20,7 +20,7 @@ class YoutubeSpotifyHeaderView: UIView {
     private let youtubeButton: UIButton = {
         let button = UIButton()
         button.clipsToBounds = true
-        button.backgroundColor = .systemBackground
+        button.backgroundColor = .secondarySystemBackground
         button.setImage(UIImage(named: "youtubeNotPressed"), for: .normal)
         button.setImage(UIImage(named: "youtubePressed"), for: .selected)
         button.isSelected = true
@@ -36,7 +36,7 @@ class YoutubeSpotifyHeaderView: UIView {
     private let spotifyButton: UIButton = {
         let button = UIButton()
         button.clipsToBounds = true
-        button.backgroundColor = .secondarySystemBackground
+        button.backgroundColor = .systemBackground
         button.setImage(UIImage(named: "spotifyNotPressed"), for: .normal)
         button.setImage(UIImage(named: "spotifyPressed"), for: .selected)
         button.alpha = 0.75
@@ -64,12 +64,12 @@ class YoutubeSpotifyHeaderView: UIView {
     @objc private func didTapYoutubeButton() {
         youtubeButton.isSelected = true
         youtubeButton.isHighlighted = false
-        youtubeButton.backgroundColor = .systemBackground
+        youtubeButton.backgroundColor = .secondarySystemBackground
         youtubeButton.alpha = 1
         youtubeButton.isUserInteractionEnabled = false
         
         spotifyButton.isSelected = false
-        spotifyButton.backgroundColor = .secondarySystemBackground
+        spotifyButton.backgroundColor = .systemBackground
         spotifyButton.alpha = 0.75
         spotifyButton.isUserInteractionEnabled = true
         
@@ -81,12 +81,12 @@ class YoutubeSpotifyHeaderView: UIView {
     @objc private func didTapSpotifyButton() {
         spotifyButton.isSelected = true
         spotifyButton.isHighlighted = false
-        spotifyButton.backgroundColor = .systemBackground
+        spotifyButton.backgroundColor = .secondarySystemBackground
         spotifyButton.alpha = 1
         spotifyButton.isUserInteractionEnabled = false
         
         youtubeButton.isSelected = false
-        youtubeButton.backgroundColor = .secondarySystemBackground
+        youtubeButton.backgroundColor = .systemBackground
         youtubeButton.alpha = 0.75
         youtubeButton.isUserInteractionEnabled = true
         
@@ -98,18 +98,18 @@ class YoutubeSpotifyHeaderView: UIView {
         super.layoutSubviews()
         
         youtubeButton.frame = CGRect(
-            x: 3,
+            x: 0,
             y: 3,
-            width: (width / 2) - 6,
+            width: (width / 2),
             height: 44
         )
         youtubeButton.layer.cornerRadius = 8.0
         youtubeButton.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMinYCorner]
         
         spotifyButton.frame = CGRect(
-            x: youtubeButton.right + 3,
+            x: youtubeButton.right,
             y: 3,
-            width: (width / 2) - 6,
+            width: (width / 2),
             height: 44
         )
         spotifyButton.layer.cornerRadius = 8.0

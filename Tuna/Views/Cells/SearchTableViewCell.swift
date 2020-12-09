@@ -6,16 +6,19 @@
 //  Copyright © 2020 Ben Williams. All rights reserved.
 //
 
+import SDWebImage
 import UIKit
 
 protocol MoreButtonDelegate: AnyObject {
-    func didTapMoreButton(with model: String)
+    func didTapMoreButton(with model: YoutubeVideoModel)
 }
 
 class SearchTableViewCell: UITableViewCell {
     static let identifier = "SearchTableViewCell"
     
     weak var delegate: MoreButtonDelegate?
+    
+    private var model: YoutubeVideoModel?
     
     // MARK:- Create UI
     
@@ -65,7 +68,7 @@ class SearchTableViewCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
-        backgroundColor = .systemBackground
+        backgroundColor = .secondarySystemBackground
         clipsToBounds = true
         
         addSubviews()
@@ -78,12 +81,22 @@ class SearchTableViewCell: UITableViewCell {
     
     // MARK:- Actions
     
-    public func configure(with model: String) {
+    public func configure(with model: YoutubeVideoModel) {
         // Configure cell, e.g. viewCountLabel.text = model.viewCount
+        guard let thumbnailURL = URL(string: model.thumbnail) else {
+            return
+        }
+        thumbnailImageView.sd_setImage(with: thumbnailURL, completed: nil)
+        titleLabel.text = model.title
+        userLabel.text = model.user
+        viewCountLabel.text = String(model.viewCount)
     }
     
     @objc private func didTapMoreButton() {
-        delegate?.didTapMoreButton(with: "More button tapped - yet to create Youtube data model")
+        guard let model = model else {
+            return
+        }
+        delegate?.didTapMoreButton(with: model)
     }
     
     private func addSubviews() {

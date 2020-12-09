@@ -1,0 +1,6 @@
+framework module Pods_Tuna {
+  umbrella header "Pods-Tuna-umbrella.h"
+
+  export *
+  module * { export * }
+}

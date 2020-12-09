@@ -10,10 +10,13 @@ import UIKit
 
 class SearchViewController: UIViewController {
     
+    var models = [YoutubeVideoModel]()
+    
     // MARK:- Create UI
     
     private let searchBar: UISearchBar = {
         let searchBar = UISearchBar()
+        searchBar.autocapitalizationType = .none
         searchBar.placeholder = "Search"
         return searchBar
     }()
@@ -22,6 +25,7 @@ class SearchViewController: UIViewController {
     
     private let tableView: UITableView = {
         let tableView = UITableView()
+        tableView.backgroundColor = .secondarySystemBackground
         tableView.register(SearchTableViewCell.self, forCellReuseIdentifier: SearchTableViewCell.identifier)
         return tableView
     }()
@@ -39,6 +43,11 @@ class SearchViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // Remove line above tab bar
+        self.tabBarController!.tabBar.layer.borderWidth = 0.50
+        self.tabBarController!.tabBar.layer.borderColor = UIColor.clear.cgColor
+        self.tabBarController?.tabBar.clipsToBounds = true
+        
         configureSearchBar()
         configureNavBarMoreButton()
         
@@ -46,10 +55,25 @@ class SearchViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         
+        tableView.separatorStyle = .none
+        
         view.addSubview(headerView)
         view.addSubview(tableView)
         
         configureDimmedView()
+        
+        // TEST: Add testModels to model array
+        let testModel = YoutubeVideoModel(
+            thumbnail: "https://i.ytimg.com/vi/zMsnnH7Tu34/mqdefault.jpg",
+            title: "Galt MacDermot - Coffe Cold",
+            user: "Galt MacDermot - Coffe Cold",
+            viewCount: 155532,
+            url: "www.youtube.com")
+
+        for _ in 0..<10 {
+            models.append(testModel)
+        }
+        
     }
     
     // MARK:- Config
@@ -70,20 +94,20 @@ class SearchViewController: UIViewController {
         navigationItem.rightBarButtonItem?.tintColor = .label
     }
     
-    // MARK:- Actions
-    
     private func configureDimmedView() {
-        view.addSubview(dimmedView)
-        
-        let gesture = UITapGestureRecognizer(
-            target: self,
-            action: #selector(didFinishSearch)
-        )
-        gesture.numberOfTapsRequired = 1
-        gesture.numberOfTouchesRequired = 1
-        
-        dimmedView.addGestureRecognizer(gesture)
-    }
+          view.addSubview(dimmedView)
+          
+          let gesture = UITapGestureRecognizer(
+              target: self,
+              action: #selector(didFinishSearch)
+          )
+          gesture.numberOfTapsRequired = 1
+          gesture.numberOfTouchesRequired = 1
+          
+          dimmedView.addGestureRecognizer(gesture)
+      }
+    
+    // MARK:- Actions
     
     @objc private func didTapNavBarMoreButton() {
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
@@ -91,7 +115,7 @@ class SearchViewController: UIViewController {
             title: "Search history",
             style: .default,
             handler: { action in
-            // Present search history view controller
+                // Present search history view controller
                 
         }))
         
@@ -119,20 +143,75 @@ class SearchViewController: UIViewController {
         
         tableView.frame = CGRect(
             x: 0,
-            y: headerView.bottom,
+            y: headerView.bottom - 3,
             width: view.width,
             height: view.height - headerView.height - (tabBarController?.tabBar.height ?? 10) - (navigationController?.navigationBar.height ?? 10)
         )
         
         dimmedView.frame = view.bounds
     }
+    
+    // MARK:- Youtube API Integration
+    
+    private func getData(from urlString: String) {
+        guard let url = URL(string: urlString) else {
+            return
+        }
+        let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
+            guard let data = data, error == nil else {
+                print("Error creating dataTask: \(error!)")
+                return
+            }
+            
+            // Have data
+            var result: YoutubeModel?
+            do {
+                result = try JSONDecoder().decode(YoutubeModel.self, from: data)
+            }
+            catch {
+                print("Failed to convert: \(error)")
+            }
+            
+            guard let json = result else {
+                return
+            }
+            
+            // Append each video's details to the models array
+            for item in json.items {
+                guard let thumbnailURL = item.snippet?.thumbnails?.medium?.url else {
+                    return
+                }
+                guard let title = item.snippet?.title else {
+                    return
+                }
+                guard let user = item.snippet?.channelTitle else {
+                    return
+                }
+            
+                self.models.append(YoutubeVideoModel(
+                    thumbnail: thumbnailURL,
+                    title: title,
+                    user: user,
+                    viewCount: 355000,
+                    url: "www.youtube.com"))
+            }
+            
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
+            
+        }
+        
+        task.resume()
+    }
 }
+
 
 // MARK:- Search bar delegate methods
 
 extension SearchViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        didCancelSearch()
+        didFinishSearch()
         guard let text = searchBar.text, !text.isEmpty else {
             return
         }
@@ -154,7 +233,7 @@ extension SearchViewController: UISearchBarDelegate {
             self.dimmedView.alpha = 0.4
         }) { (done) in
             if done {
-               self.tableView.isHidden = false
+                self.tableView.isHidden = false
             }
         }
     }
@@ -192,7 +271,16 @@ extension SearchViewController: UISearchBarDelegate {
     
     private func query(with text: String) {
         // Perform YouTube search with text
-        print("Search button pressed")
+        
+        models = [YoutubeVideoModel]()
+        
+        let queryString = text.replacingOccurrences(of: " ", with: "+")
+        
+        let baseUrlString = "https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=25"
+        let apiString = "key=\(Secrets.youtubeAPIKey)"
+        let urlString = "\(baseUrlString)&q=\(queryString)&\(apiString)"
+        
+        getData(from: urlString)
     }
     
 }
@@ -202,13 +290,17 @@ extension SearchViewController: UISearchBarDelegate {
 extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        10
+        models.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: SearchTableViewCell.identifier, for: indexPath) as! SearchTableViewCell
         cell.delegate = self
-        cell.configure(with: "Model goes here")
+        guard !models.isEmpty else {
+            return UITableViewCell()
+        }
+        let model = models[indexPath.row]
+        cell.configure(with: model)
         return cell
     }
     
@@ -218,6 +310,15 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 100
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if scrollView == self.tableView {
+            if scrollView.contentOffset.y <= 0 {
+                scrollView.contentOffset = CGPoint.zero
+            }
+        }
+        
     }
     
 }
@@ -239,7 +340,7 @@ extension SearchViewController: YoutubeSpotifyHeaderViewDelegate {
 // MARK:- moreButtonDelegate Methods
 
 extension SearchViewController: MoreButtonDelegate {
-    func didTapMoreButton(with model: String) {
+    func didTapMoreButton(with model: YoutubeVideoModel) {
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         // TODO:- Add 'if' statement here so that if the video is already in the library then it says 'Remove from library' (also make this style .destructive so that it is red), otherwise it should say 'Add to library'
@@ -249,7 +350,7 @@ extension SearchViewController: MoreButtonDelegate {
             style: .default,
             handler: { action in
                 // Add to array of models within library and display a message that automatically disappears saying that it has successfully been added (otherwise, show an error message)
-            }))
+        }))
         
         actionSheet.addAction(UIAlertAction(
             title: "Copy link",
@@ -262,7 +363,7 @@ extension SearchViewController: MoreButtonDelegate {
             title: "Cancel",
             style: .cancel,
             handler: nil))
-     
+        
         actionSheet.view.tintColor = .label
         
         present(actionSheet, animated: true, completion: nil)
