@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -201,7 +201,6 @@
 				91979414EF9193E904C37BA9 /* Pods-Tuna.debug.xcconfig */,
 				3793DACEEA0AC4473FBE2140 /* Pods-Tuna.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};

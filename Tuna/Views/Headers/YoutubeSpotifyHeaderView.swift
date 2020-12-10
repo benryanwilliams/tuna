@@ -26,7 +26,7 @@ class YoutubeSpotifyHeaderView: UIView {
         button.isSelected = true
         button.alpha = 1.0
         button.adjustsImageWhenHighlighted = false
-        button.contentEdgeInsets = UIEdgeInsets(top: 10, left: -3, bottom: 10, right: 30)
+        button.contentEdgeInsets = UIEdgeInsets(top: 10, left: -10, bottom: 10, right: 30)
         button.imageView?.contentMode = .scaleAspectFit
         button.isUserInteractionEnabled = false
         
@@ -55,6 +55,7 @@ class YoutubeSpotifyHeaderView: UIView {
         
         addSubview(youtubeButton)
         addSubview(spotifyButton)
+        
     }
     
     required init?(coder: NSCoder) {
@@ -115,8 +116,5 @@ class YoutubeSpotifyHeaderView: UIView {
         spotifyButton.layer.cornerRadius = 8.0
         spotifyButton.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMinYCorner]
     }
-    
-    
-    
     
 }

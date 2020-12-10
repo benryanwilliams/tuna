@@ -16,6 +16,7 @@ class SearchViewController: UIViewController {
     
     private let searchBar: UISearchBar = {
         let searchBar = UISearchBar()
+        searchBar.backgroundColor = .systemBackground
         searchBar.autocapitalizationType = .none
         searchBar.placeholder = "Search"
         return searchBar
@@ -48,6 +49,14 @@ class SearchViewController: UIViewController {
         self.tabBarController!.tabBar.layer.borderColor = UIColor.clear.cgColor
         self.tabBarController?.tabBar.clipsToBounds = true
         
+        self.tabBarController?.tabBar.barTintColor = .systemBackground
+        
+        // Remove space below navbar following 'Translucent' being unchecked
+        extendedLayoutIncludesOpaqueBars = true
+        
+        // Remove line below navigation bar
+        self.navigationController?.navigationBar.setValue(true, forKey: "hidesShadow")
+        
         configureSearchBar()
         configureNavBarMoreButton()
         
@@ -66,10 +75,10 @@ class SearchViewController: UIViewController {
         let testModel = YoutubeVideoModel(
             thumbnail: "https://i.ytimg.com/vi/zMsnnH7Tu34/mqdefault.jpg",
             title: "Galt MacDermot - Coffe Cold",
-            user: "Galt MacDermot - Coffe Cold",
+            user: "xamarufter",
             viewCount: 155532,
             url: "www.youtube.com")
-
+        
         for _ in 0..<10 {
             models.append(testModel)
         }
@@ -95,17 +104,17 @@ class SearchViewController: UIViewController {
     }
     
     private func configureDimmedView() {
-          view.addSubview(dimmedView)
-          
-          let gesture = UITapGestureRecognizer(
-              target: self,
-              action: #selector(didFinishSearch)
-          )
-          gesture.numberOfTapsRequired = 1
-          gesture.numberOfTouchesRequired = 1
-          
-          dimmedView.addGestureRecognizer(gesture)
-      }
+        view.addSubview(dimmedView)
+        
+        let gesture = UITapGestureRecognizer(
+            target: self,
+            action: #selector(didFinishSearch)
+        )
+        gesture.numberOfTapsRequired = 1
+        gesture.numberOfTouchesRequired = 1
+        
+        dimmedView.addGestureRecognizer(gesture)
+    }
     
     // MARK:- Actions
     
@@ -187,7 +196,7 @@ class SearchViewController: UIViewController {
                 guard let user = item.snippet?.channelTitle else {
                     return
                 }
-            
+                
                 self.models.append(YoutubeVideoModel(
                     thumbnail: thumbnailURL,
                     title: title,
@@ -312,6 +321,17 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
         return 100
     }
     
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let view = UIView()
+        view.backgroundColor = .secondarySystemBackground
+        return view
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 10
+    }
+    
+    // Disable bounce at top of tableView
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if scrollView == self.tableView {
             if scrollView.contentOffset.y <= 0 {
@@ -340,8 +360,15 @@ extension SearchViewController: YoutubeSpotifyHeaderViewDelegate {
 // MARK:- moreButtonDelegate Methods
 
 extension SearchViewController: MoreButtonDelegate {
-    func didTapMoreButton(with model: YoutubeVideoModel) {
+    func didTapMoreButton(cell: SearchTableViewCell) {
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        guard let indexPath = tableView.indexPath(for: cell) else {
+            print("Error: could not retrieve index path")
+            return
+        }
+        let model = models[indexPath.row]
+        print(model)
         
         // TODO:- Add 'if' statement here so that if the video is already in the library then it says 'Remove from library' (also make this style .destructive so that it is red), otherwise it should say 'Add to library'
         

@@ -10,7 +10,7 @@ import SDWebImage
 import UIKit
 
 protocol MoreButtonDelegate: AnyObject {
-    func didTapMoreButton(with model: YoutubeVideoModel)
+    func didTapMoreButton(cell: SearchTableViewCell)
 }
 
 class SearchTableViewCell: UITableViewCell {
@@ -93,10 +93,7 @@ class SearchTableViewCell: UITableViewCell {
     }
     
     @objc private func didTapMoreButton() {
-        guard let model = model else {
-            return
-        }
-        delegate?.didTapMoreButton(with: model)
+        delegate?.didTapMoreButton(cell: self)
     }
     
     private func addSubviews() {
@@ -113,7 +110,7 @@ class SearchTableViewCell: UITableViewCell {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        let bufferSize: CGFloat = 20
+        let bufferSize: CGFloat = 18
         
         thumbnailImageView.frame = CGRect(
             x: bufferSize * 2,
@@ -130,24 +127,24 @@ class SearchTableViewCell: UITableViewCell {
         )
         
         titleLabel.frame = CGRect(
-            x: thumbnailImageView.right + (bufferSize * 1.5),
+            x: thumbnailImageView.right + (bufferSize * 1.75),
             y: bufferSize / 2,
-            width: contentView.width - (bufferSize * 3.5) - thumbnailImageView.width - moreButton.width,
+            width: contentView.width - (bufferSize * 5.5) - thumbnailImageView.width - moreButton.width,
             height: (contentView.height - (bufferSize * 2)) / 2
         )
         titleLabel.sizeToFit()
         
         userLabel.frame = CGRect(
-            x: thumbnailImageView.right + (bufferSize * 1.5),
+            x: thumbnailImageView.right + (bufferSize * 1.75),
             y: titleLabel.bottom,
-            width: contentView.width - (bufferSize * 3.5) - thumbnailImageView.width - moreButton.width,
+            width: contentView.width - (bufferSize * 5.5) - thumbnailImageView.width - moreButton.width,
             height: (contentView.height - (bufferSize * 2)) / 4
         )
         
         viewCountLabel.frame = CGRect(
-            x: thumbnailImageView.right + (bufferSize * 1.5),
+            x: thumbnailImageView.right + (bufferSize * 1.75),
             y: userLabel.bottom,
-            width: contentView.width - (bufferSize * 3.5) - thumbnailImageView.width - moreButton.width,
+            width: contentView.width - (bufferSize * 5.5) - thumbnailImageView.width - moreButton.width,
             height: (contentView.height - (bufferSize * 2)) / 4
         )
     }
