@@ -12,6 +12,9 @@ struct YoutubeVideoModel {
     let thumbnail: String
     let title: String
     let user: String
-    let viewCount: Int
+    let viewCount: String
+    let id: String
     let url: String
+    let isInLibrary: Bool
+    
 }

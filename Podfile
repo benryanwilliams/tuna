@@ -8,5 +8,6 @@ target 'Tuna' do
   # Pods for Tuna
 
 pod 'SDWebImage'
+pod 'youtube-ios-player-helper'
 
 end

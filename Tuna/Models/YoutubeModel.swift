@@ -24,11 +24,39 @@ struct PageInfo: Codable {
 struct Items: Codable {
     let kind: String?
     let etag: String?
-    let id: ItemsID?
+    let id: ItemsID
     let snippet: Snippet?
+    let statistics: Statistics?
 }
 
 struct ItemsID: Codable {
+    let idString: String?
+    let idMoreItems: IDMoreItems?
+
+    // Where we determine what type the value is
+    init(from decoder: Decoder) throws {
+        let container =  try decoder.singleValueContainer()
+
+        // Check for a string
+        do {
+            idString = try container.decode(String.self)
+            idMoreItems = nil
+        } catch {
+            // Check for more items
+            idMoreItems = try container.decode(IDMoreItems.self)
+            idString = nil
+        }
+    }
+
+    // We need to go back to a dynamic type, so based on the data we have stored, encode to the proper type
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try (idString != nil) ? container.encode(idMoreItems) : container.encode(false)
+    }
+}
+
+
+struct IDMoreItems: Codable {
     let kind: String?
     let videoId: String?
 }
@@ -59,3 +87,8 @@ struct ThumbnailHigh: Codable {
     let width: Int?
     let height: Int?
 }
+
+struct Statistics: Codable {
+    let viewCount: String?
+}
+

@@ -76,8 +76,11 @@ class SearchViewController: UIViewController {
             thumbnail: "https://i.ytimg.com/vi/zMsnnH7Tu34/mqdefault.jpg",
             title: "Galt MacDermot - Coffe Cold",
             user: "xamarufter",
-            viewCount: 155532,
-            url: "www.youtube.com")
+            viewCount: (1234567 as NSNumber).description(withLocale: Locale.current),
+            id: "xjhfjhdlskjlsjf",
+            url: "www.youtube.com",
+            isInLibrary: false
+        )
         
         for _ in 0..<10 {
             models.append(testModel)
@@ -163,9 +166,15 @@ class SearchViewController: UIViewController {
     // MARK:- Youtube API Integration
     
     private func getData(from urlString: String) {
+        
+        var videoIds = [String]()
+        
         guard let url = URL(string: urlString) else {
             return
         }
+        
+        print(url)
+        
         let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
             guard let data = data, error == nil else {
                 print("Error creating dataTask: \(error!)")
@@ -185,32 +194,77 @@ class SearchViewController: UIViewController {
                 return
             }
             
-            // Append each video's details to the models array
+            // Append videoURL to videoUrls array
             for item in json.items {
-                guard let thumbnailURL = item.snippet?.thumbnails?.medium?.url else {
+                guard let id = item.id.idMoreItems?.videoId else {
+                    print("Could not retrieve videoIDs")
                     return
                 }
-                guard let title = item.snippet?.title else {
-                    return
-                }
-                guard let user = item.snippet?.channelTitle else {
+                videoIds.append(id)
+            }
+            
+            // Get detailed video data using videoUrls
+            var idsString = ""
+            for id in videoIds {
+                idsString.append("\(id)%2C")
+            }
+            let urlString = "https://youtube.googleapis.com/youtube/v3/videos?part=snippet%2CcontentDetails%2Cstatistics&id=\(idsString)&key=\(Secrets.youtubeAPIKey)"
+            
+            print(urlString)
+            
+            // Get data
+            guard let url = URL(string: urlString) else {
+                return
+            }
+            
+            let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
+                guard let data = data, error == nil else {
                     return
                 }
                 
-                self.models.append(YoutubeVideoModel(
-                    thumbnail: thumbnailURL,
-                    title: title,
-                    user: user,
-                    viewCount: 355000,
-                    url: "www.youtube.com"))
+                // Have data
+                var result: YoutubeModel?
+                
+                do {
+                    result = try JSONDecoder().decode(YoutubeModel.self, from: data)
+                }
+                catch {
+                    print("Error decoding data: \(error)")
+                }
+                
+                guard let json = result else {
+                    return
+                }
+                
+                // Append each video's details to the models array
+                for item in json.items {
+                    guard let thumbnailURL = item.snippet?.thumbnails?.medium?.url,
+                        let title = item.snippet?.title,
+                        let user = item.snippet?.channelTitle,
+                        let count = item.statistics?.viewCount,
+                        let id = item.id.idString else {
+                        return
+                    }
+                    
+                    self.models.append(YoutubeVideoModel(
+                        thumbnail: thumbnailURL,
+                        title: title,
+                        user: user,
+                        viewCount: "\((Int(count)! as NSNumber).description(withLocale: Locale.current)) views",
+                        id: id,
+                        url: "https://www.youtube.com/watch?v=\(id)",
+                        isInLibrary: false
+                        )
+                    )
+                }
+                print(self.models)
+                
+                DispatchQueue.main.async {
+                    self.tableView.reloadData()
+                }
             }
-            
-            DispatchQueue.main.async {
-                self.tableView.reloadData()
-            }
-            
+            task.resume()
         }
-        
         task.resume()
     }
 }
@@ -285,7 +339,7 @@ extension SearchViewController: UISearchBarDelegate {
         
         let queryString = text.replacingOccurrences(of: " ", with: "+")
         
-        let baseUrlString = "https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=25"
+        let baseUrlString = "https://youtube.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=25"
         let apiString = "key=\(Secrets.youtubeAPIKey)"
         let urlString = "\(baseUrlString)&q=\(queryString)&\(apiString)"
         
@@ -314,6 +368,9 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let vc = YoutubePlayerViewController()
+        vc.model = models[indexPath.row]
+        navigationController?.pushViewController(vc, animated: true)
         print("cell pressed")
     }
     
