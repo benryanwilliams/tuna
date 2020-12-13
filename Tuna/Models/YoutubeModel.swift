@@ -33,7 +33,7 @@ struct ItemsID: Codable {
     let idString: String?
     let idMoreItems: IDMoreItems?
 
-    // Where we determine what type the value is
+    // Determine whether 'id' is a string or a container containing more items
     init(from decoder: Decoder) throws {
         let container =  try decoder.singleValueContainer()
 
@@ -48,7 +48,7 @@ struct ItemsID: Codable {
         }
     }
 
-    // We need to go back to a dynamic type, so based on the data we have stored, encode to the proper type
+    // Convert back to dynamic type, so based on the data we have stored, encode to the proper type
     func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try (idString != nil) ? container.encode(idMoreItems) : container.encode(false)

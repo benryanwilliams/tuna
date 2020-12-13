@@ -10,7 +10,7 @@ import UIKit
 
 class SearchViewController: UIViewController {
     
-    var models = [YoutubeVideoModel]()
+    public var models = [YoutubeVideoModel]()
     
     // MARK:- Create UI
     
@@ -175,6 +175,7 @@ class SearchViewController: UIViewController {
         
         print(url)
         
+        // 1) Create data task to get video id
         let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
             guard let data = data, error == nil else {
                 print("Error creating dataTask: \(error!)")
@@ -194,7 +195,7 @@ class SearchViewController: UIViewController {
                 return
             }
             
-            // Append videoURL to videoUrls array
+            // Append video id to videoIds array
             for item in json.items {
                 guard let id = item.id.idMoreItems?.videoId else {
                     print("Could not retrieve videoIDs")
@@ -203,7 +204,7 @@ class SearchViewController: UIViewController {
                 videoIds.append(id)
             }
             
-            // Get detailed video data using videoUrls
+            // 2) Get detailed video data using videoId
             var idsString = ""
             for id in videoIds {
                 idsString.append("\(id)%2C")
@@ -257,7 +258,6 @@ class SearchViewController: UIViewController {
                         )
                     )
                 }
-                print(self.models)
                 
                 DispatchQueue.main.async {
                     self.tableView.reloadData()
@@ -415,7 +415,7 @@ extension SearchViewController: YoutubeSpotifyHeaderViewDelegate {
 }
 
 // MARK:- moreButtonDelegate Methods
-
+    
 extension SearchViewController: MoreButtonDelegate {
     func didTapMoreButton(cell: SearchTableViewCell) {
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
@@ -434,6 +434,9 @@ extension SearchViewController: MoreButtonDelegate {
             style: .default,
             handler: { action in
                 // Add to array of models within library and display a message that automatically disappears saying that it has successfully been added (otherwise, show an error message)
+                LibraryViewController.models.append(self.models[indexPath.row])
+                
+                
         }))
         
         actionSheet.addAction(UIAlertAction(

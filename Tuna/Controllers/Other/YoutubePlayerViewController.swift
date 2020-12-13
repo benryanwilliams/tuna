@@ -27,25 +27,36 @@ class YoutubePlayerViewController: UIViewController, YTPlayerViewDelegate {
         return view
     }()
     
+    private let titleLabel: UILabel = {
+       let label = UILabel()
+        label.textColor = .label
+        label.font = .systemFont(ofSize: 19, weight: .semibold)
+        label.textAlignment = .center
+        return label
+        
+    }()
+    
     private let addToLibraryButton: UIButton = {
        let button = UIButton()
-        button.setTitle("Add to library", for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 20, weight: .semibold)
+        button.setImage(UIImage(systemName: "folder.badge.plus"), for: .normal)
+        button.imageView?.tintColor = .secondaryLabel
+        button.imageView?.contentMode = .scaleAspectFit
+        button.contentVerticalAlignment = .fill
+        button.contentHorizontalAlignment = .fill
         button.clipsToBounds = true
-        button.backgroundColor = .secondarySystemBackground
-        button.layer.borderWidth = 4
-        button.layer.borderColor = UIColor.tertiarySystemBackground.cgColor
+        button.backgroundColor = .systemBackground
         return button
     }()
     
     private let copyLinkButton: UIButton = {
        let button = UIButton()
-        button.setTitle("Copy link", for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 20, weight: .semibold)
+        button.setImage(UIImage(systemName: "link"), for: .normal)
+        button.imageView?.tintColor = .secondaryLabel
+        button.imageView?.contentMode = .scaleAspectFit
+        button.contentVerticalAlignment = .fill
+        button.contentHorizontalAlignment = .fill
         button.clipsToBounds = true
-        button.backgroundColor = .secondarySystemBackground
-        button.layer.borderWidth = 4
-        button.layer.borderColor = UIColor.tertiarySystemBackground.cgColor
+        button.backgroundColor = .systemBackground
         return button
     }()
     
@@ -59,6 +70,7 @@ class YoutubePlayerViewController: UIViewController, YTPlayerViewDelegate {
         configurePlayerView()
         configureAddToLibraryButton()
         configureCopyLinkButton()
+        configureTitle()
     }
     
     // MARK:- Config
@@ -79,16 +91,21 @@ class YoutubePlayerViewController: UIViewController, YTPlayerViewDelegate {
         
         // If track is in library then display 'remove', otherwise display 'add'
         if model?.isInLibrary == true {
-            addToLibraryButton.setTitle("Remove from library", for: .normal)
+            addToLibraryButton.setImage(UIImage(systemName: "folder.badge.minus"), for: .normal)
         }
         else {
-            addToLibraryButton.setTitle("Add to library", for: .normal)
+            addToLibraryButton.setImage(UIImage(systemName: "folder.badge.plus"), for: .normal)
         }
     }
     
     private func configureCopyLinkButton() {
         view.addSubview(copyLinkButton)
         addToLibraryButton.addTarget(self, action: #selector(didTapCopyLinkButton), for: .touchUpInside)
+    }
+    
+    private func configureTitle() {
+        view.addSubview(titleLabel)
+        titleLabel.text = model?.title
     }
     
     // MARK:- Actions
@@ -106,26 +123,38 @@ class YoutubePlayerViewController: UIViewController, YTPlayerViewDelegate {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+        
+        let videoHeight = view.width * 720 / 1280
+        let bufferSize: CGFloat = 25
+        let buttonSize: CGFloat = 36
+        
+        titleLabel.frame = CGRect(
+            x: 0,
+            y: ((view.height - addToLibraryButton.height - videoHeight - bufferSize) / 3) - 20 - bufferSize,
+            width: view.width,
+            height: 20
+        )
+        
         playerView.frame = CGRect(
             x: 0,
-            y: 0,
+            y: (view.height - addToLibraryButton.height - videoHeight - bufferSize) / 3,
             width: view.width,
-            height: view.width * 720 / 1280
+            height: videoHeight
         )
         
         addToLibraryButton.frame = CGRect(
-            x: 0,
-            y: playerView.bottom + 4,
-            width: view.width,
-            height: 70
+            x: view.right - ((buttonSize + bufferSize) * 2),
+            y: playerView.bottom + bufferSize,
+            width: buttonSize,
+            height: buttonSize
         )
         addToLibraryButton.layer.cornerRadius = 8.0
         
         copyLinkButton.frame = CGRect(
-            x: 0,
-            y: addToLibraryButton.bottom + 4,
-            width: view.width,
-            height: 70
+            x: view.right - buttonSize - bufferSize,
+            y: playerView.bottom + bufferSize,
+            width: buttonSize,
+            height: buttonSize
         )
         copyLinkButton.layer.cornerRadius = 8.0
     }
