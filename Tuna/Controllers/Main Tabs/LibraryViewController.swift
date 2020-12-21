@@ -10,7 +10,10 @@ import UIKit
 
 class LibraryViewController: UIViewController {
     
-    static var models = [YoutubeVideoModel]()
+    private let appDelegate = UIApplication.shared.delegate as! AppDelegate
+    private let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    
+    static var models = [YoutubeLibraryModel]()
     
     // MARK:- Create UI
     
@@ -18,7 +21,7 @@ class LibraryViewController: UIViewController {
         let searchBar = UISearchBar()
         searchBar.backgroundColor = .systemBackground
         searchBar.autocapitalizationType = .none
-        searchBar.placeholder = "Search"
+        searchBar.placeholder = "Filter"
         return searchBar
     }()
     
@@ -43,7 +46,9 @@ class LibraryViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
-        self.tableView.reloadData()
+        
+        fetchLibraryData(containing: nil)
+
     }
     
     // MARK:- viewDidLoad
@@ -133,6 +138,39 @@ class LibraryViewController: UIViewController {
         present(actionSheet, animated: true)
     }
     
+    private func fetchLibraryData(containing text: String?) {
+        let request = YoutubeLibraryModel.createFetchRequest()
+        
+        var titlePredicate: NSPredicate?
+        
+        if text != nil {
+            titlePredicate = NSPredicate(format: "%K CONTAINS[c] %@", argumentArray: [#keyPath(YoutubeLibraryModel.title), text!])
+        }
+        else {
+            titlePredicate = nil
+        }
+        
+        request.predicate = titlePredicate
+        
+        let sortByDate = NSSortDescriptor(key: "dateAdded", ascending: true)
+        request.sortDescriptors = [sortByDate]
+        
+        do {
+            LibraryViewController.models = try context.fetch(request)
+        }
+        catch {
+            print("Error fetching: \(error)")
+        }
+        tableView.reloadData()
+    }
+    
+    private func deleteLibraryData(model: YoutubeLibraryModel, at indexPath: IndexPath) {
+        context.delete(model)
+        appDelegate.saveContext()
+        LibraryViewController.models.remove(at: indexPath.row)
+        tableView.reloadData()
+    }
+    
     // MARK:- viewDidLayoutSubviews
     
     override func viewDidLayoutSubviews() {
@@ -166,8 +204,14 @@ extension LibraryViewController: UISearchBarDelegate {
         guard let text = searchBar.text, !text.isEmpty else {
             return
         }
-        query(with: text)
+        fetchLibraryData(containing: text)
         
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchText == "" {
+            fetchLibraryData(containing: nil)
+        }
     }
     
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
@@ -207,6 +251,7 @@ extension LibraryViewController: UISearchBarDelegate {
     }
     
     @objc private func didCancelSearch() {
+        fetchLibraryData(containing: nil)
         searchBar.text = nil
         searchBar.resignFirstResponder()
         configureNavBarMoreButton()
@@ -217,11 +262,6 @@ extension LibraryViewController: UISearchBarDelegate {
                 self.dimmedView.isHidden = true
             }
         }
-        
-    }
-    
-    private func query(with text: String) {
-        // Search videos
         
     }
     
@@ -241,14 +281,38 @@ extension LibraryViewController: UITableViewDelegate, UITableViewDataSource {
         guard !LibraryViewController.models.isEmpty else {
             return UITableViewCell()
         }
-        let model = LibraryViewController.models[indexPath.row]
-        cell.configure(with: model)
+        let libraryModel = LibraryViewController.models[indexPath.row]
+        
+        let cellModel = YoutubeVideoModel(
+            thumbnail: libraryModel.thumbnail,
+            title: libraryModel.title,
+            user: libraryModel.user,
+            viewCount: libraryModel.viewCount,
+            id: libraryModel.id,
+            url: libraryModel.url,
+            isInLibrary: libraryModel.isInLibrary
+        )
+        
+        cell.configure(with: cellModel)
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        searchBar.text = nil
         let vc = YoutubePlayerViewController()
-        vc.model = LibraryViewController.models[indexPath.row]
+        
+        let libraryModel = LibraryViewController.models[indexPath.row]
+        
+        let cellModel = YoutubeVideoModel(
+            thumbnail: libraryModel.thumbnail,
+            title: libraryModel.title,
+            user: libraryModel.user,
+            viewCount: libraryModel.viewCount,
+            id: libraryModel.id,
+            url: libraryModel.url,
+            isInLibrary: libraryModel.isInLibrary
+        )
+        vc.model = cellModel
         navigationController?.pushViewController(vc, animated: true)
         print("cell pressed")
     }
@@ -315,19 +379,24 @@ extension LibraryViewController: MoreButtonDelegate {
                 // Display 'are you sure' alert
                 let alert = UIAlertController(title: "Are you sure?", message: nil, preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "Remove", style: .destructive, handler: { (action) in
-                    // Remove from models array
-                    
+                    // Remove from context
+                    print(LibraryViewController.models)
+                    self.deleteLibraryData(model: model, at: indexPath)
+                    print(LibraryViewController.models)
                     
                     
                 }))
                 alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+                self.present(alert, animated: true)
         }))
         
         actionSheet.addAction(UIAlertAction(
             title: "Copy link",
             style: .default,
             handler: { action in
-                // Fetch link to video and add to clipboard and display a message that automatically disappears saying 'Link copied' if it has successfully been added to the clipboard
+                // Fetch video url and add to clipboard
+                let pasteboard = UIPasteboard.general
+                pasteboard.string = model.url
         }))
         
         actionSheet.addAction(UIAlertAction(

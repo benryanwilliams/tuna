@@ -65,6 +65,8 @@ class YoutubePlayerViewController: UIViewController, YTPlayerViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        view.backgroundColor = .systemBackground
+        
         navigationController?.navigationBar.tintColor = .label
         
         configurePlayerView()

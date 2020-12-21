@@ -121,9 +121,9 @@ class SearchTableViewCell: UITableViewCell {
         
         moreButton.frame = CGRect(
             x: contentView.right - 20 - bufferSize,
-            y: bufferSize / 2,
-            width: 20,
-            height: 20
+            y: 0,
+            width: 40,
+            height: 40
         )
         
         titleLabel.frame = CGRect(

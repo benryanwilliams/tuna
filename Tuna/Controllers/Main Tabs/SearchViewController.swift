@@ -10,6 +10,9 @@ import UIKit
 
 class SearchViewController: UIViewController {
     
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    
     public var models = [YoutubeVideoModel]()
     
     // MARK:- Create UI
@@ -334,7 +337,6 @@ extension SearchViewController: UISearchBarDelegate {
     
     private func query(with text: String) {
         // Perform YouTube search with text
-        
         models = [YoutubeVideoModel]()
         
         let queryString = text.replacingOccurrences(of: " ", with: "+")
@@ -433,8 +435,25 @@ extension SearchViewController: MoreButtonDelegate {
             title: "Add to library",
             style: .default,
             handler: { action in
-                // Add to array of models within library and display a message that automatically disappears saying that it has successfully been added (otherwise, show an error message)
-                LibraryViewController.models.append(self.models[indexPath.row])
+                // Add to array of models within library and save to context
+                let selectedModel = self.models[indexPath.row]
+                
+                let libraryModel = YoutubeLibraryModel(
+                    entity: YoutubeLibraryModel.entity(),
+                    insertInto: self.context
+                )
+                
+                libraryModel.thumbnail = selectedModel.thumbnail
+                libraryModel.title = selectedModel.title
+                libraryModel.user = selectedModel.user
+                libraryModel.viewCount = selectedModel.viewCount
+                libraryModel.id = selectedModel.id
+                libraryModel.url = selectedModel.url
+                libraryModel.isInLibrary = selectedModel.isInLibrary
+                libraryModel.dateAdded = Date()
+                self.appDelegate.saveContext()
+                
+                LibraryViewController.models.append(libraryModel)
                 
                 
         }))
@@ -443,7 +462,9 @@ extension SearchViewController: MoreButtonDelegate {
             title: "Copy link",
             style: .default,
             handler: { action in
-                // Fetch link to video and add to clipboard and display a message that automatically disappears saying 'Link copied' if it has successfully been added to the clipboard
+                // Fetch video url and add to clipboard
+                let pasteboard = UIPasteboard.general
+                pasteboard.string = model.url
         }))
         
         actionSheet.addAction(UIAlertAction(
