@@ -10,15 +10,19 @@ import youtube_ios_player_helper
 import UIKit
 
 protocol YoutubePlayerViewControllerDelegate: AnyObject {
-    func didTapAddToLibraryButton()
-    func didTapCopyLinkButton()
+    func didTapAddToLibraryButton(isInLibrary: Bool, model: YoutubeVideoModel?)
 }
 
 class YoutubePlayerViewController: UIViewController, YTPlayerViewDelegate {
     
+    private let appDelegate = UIApplication.shared.delegate as! AppDelegate
+    private let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    
     weak var delegate: YoutubePlayerViewControllerDelegate?
     
     public var model: YoutubeVideoModel?
+    
+    public var isInLibrary = false
     
     // MARK:- Create UI
     
@@ -92,8 +96,8 @@ class YoutubePlayerViewController: UIViewController, YTPlayerViewDelegate {
         addToLibraryButton.addTarget(self, action: #selector(didTapAddToLibraryButton), for: .touchUpInside)
         
         // If track is in library then display 'remove', otherwise display 'add'
-        if model?.isInLibrary == true {
-            addToLibraryButton.setImage(UIImage(systemName: "folder.badge.minus"), for: .normal)
+        if isInLibrary == true {
+            addToLibraryButton.setImage(UIImage(systemName: "folder.fill.badge.minus"), for: .normal)
         }
         else {
             addToLibraryButton.setImage(UIImage(systemName: "folder.badge.plus"), for: .normal)
@@ -102,7 +106,7 @@ class YoutubePlayerViewController: UIViewController, YTPlayerViewDelegate {
     
     private func configureCopyLinkButton() {
         view.addSubview(copyLinkButton)
-        addToLibraryButton.addTarget(self, action: #selector(didTapCopyLinkButton), for: .touchUpInside)
+        copyLinkButton.addTarget(self, action: #selector(didTapCopyLinkButton), for: .touchUpInside)
     }
     
     private func configureTitle() {
@@ -113,11 +117,14 @@ class YoutubePlayerViewController: UIViewController, YTPlayerViewDelegate {
     // MARK:- Actions
     
     @objc private func didTapAddToLibraryButton() {
-        delegate?.didTapAddToLibraryButton()
+        delegate?.didTapAddToLibraryButton(isInLibrary: isInLibrary, model: model)
+        isInLibrary = !isInLibrary
+        configureAddToLibraryButton()
     }
     
     @objc private func didTapCopyLinkButton() {
-        delegate?.didTapCopyLinkButton()
+        let pasteboard = UIPasteboard.general
+        pasteboard.string = model?.url
     }
     
     

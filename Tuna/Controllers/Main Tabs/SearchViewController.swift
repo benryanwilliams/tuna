@@ -371,6 +371,7 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let vc = YoutubePlayerViewController()
+        vc.delegate = self
         vc.model = models[indexPath.row]
         navigationController?.pushViewController(vc, animated: true)
         print("cell pressed")
@@ -436,25 +437,7 @@ extension SearchViewController: MoreButtonDelegate {
             style: .default,
             handler: { action in
                 // Add to array of models within library and save to context
-                let selectedModel = self.models[indexPath.row]
-                
-                let libraryModel = YoutubeLibraryModel(
-                    entity: YoutubeLibraryModel.entity(),
-                    insertInto: self.context
-                )
-                
-                libraryModel.thumbnail = selectedModel.thumbnail
-                libraryModel.title = selectedModel.title
-                libraryModel.user = selectedModel.user
-                libraryModel.viewCount = selectedModel.viewCount
-                libraryModel.id = selectedModel.id
-                libraryModel.url = selectedModel.url
-                libraryModel.isInLibrary = selectedModel.isInLibrary
-                libraryModel.dateAdded = Date()
-                self.appDelegate.saveContext()
-                
-                LibraryViewController.models.append(libraryModel)
-                
+                self.addToLibrary(at: indexPath)
                 
         }))
         
@@ -475,6 +458,71 @@ extension SearchViewController: MoreButtonDelegate {
         actionSheet.view.tintColor = .label
         
         present(actionSheet, animated: true, completion: nil)
+        
+    }
+    
+    private func addToLibrary(at indexPath: IndexPath) {
+        let selectedModel = self.models[indexPath.row]
+        
+        let libraryModel = YoutubeLibraryModel(
+            entity: YoutubeLibraryModel.entity(),
+            insertInto: self.context
+        )
+        
+        libraryModel.thumbnail = selectedModel.thumbnail
+        libraryModel.title = selectedModel.title
+        libraryModel.user = selectedModel.user
+        libraryModel.viewCount = selectedModel.viewCount
+        libraryModel.id = selectedModel.id
+        libraryModel.url = selectedModel.url
+        libraryModel.isInLibrary = selectedModel.isInLibrary
+        libraryModel.dateAdded = Date()
+        self.appDelegate.saveContext()
+    }
+    
+    
+}
+
+// MARK:- YoutubePlayerViewControllerDelegate
+
+extension SearchViewController: YoutubePlayerViewControllerDelegate {
+    func didTapAddToLibraryButton(isInLibrary: Bool, model: YoutubeVideoModel?) {
+        print("Tapped add button from search")
+        
+        if isInLibrary == true {
+            // Remove from library
+            let request = YoutubeLibraryModel.createFetchRequest()
+            
+            guard let id = model?.id else {
+                return
+            }
+            
+            request.predicate = NSPredicate(
+                format: "%K CONTAINS[c] %@",
+                argumentArray: [#keyPath(YoutubeLibraryModel.id), id]
+            )
+            
+            do {
+                let results = try context.fetch(request)
+                if results.count > 0 {
+                    context.delete(results.last!)
+                }
+            }
+            catch {
+                print("Error fetching: \(error)")
+            }
+            
+        }
+        else {
+            // Add to library
+            guard let indexPath = tableView.indexPathForSelectedRow else {
+                return
+            }
+            
+            self.addToLibrary(at: indexPath)
+        }
+        
+        
         
     }
     

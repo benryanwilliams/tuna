@@ -300,6 +300,8 @@ extension LibraryViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         searchBar.text = nil
         let vc = YoutubePlayerViewController()
+        vc.isInLibrary = true
+        vc.delegate = self
         
         let libraryModel = LibraryViewController.models[indexPath.row]
         
@@ -410,5 +412,47 @@ extension LibraryViewController: MoreButtonDelegate {
         
     }
     
+    
+}
+
+// MARK:- YoutubePlayerViewControllerDelegate
+
+extension LibraryViewController: YoutubePlayerViewControllerDelegate {
+    
+    func didTapAddToLibraryButton(isInLibrary: Bool, model: YoutubeVideoModel?) {
+        print("Tapped add button from library")
+        
+        if isInLibrary == true {
+            // Remove from library
+            guard let indexPath = tableView.indexPathForSelectedRow else {
+                return
+            }
+            let model = LibraryViewController.models[indexPath.row]
+            
+            deleteLibraryData(model: model, at: indexPath)
+        }
+        else {
+            // Add to library
+            let libraryModel = YoutubeLibraryModel(
+                entity: YoutubeLibraryModel.entity(),
+                insertInto: self.context
+            )
+            
+            guard let model = model else {
+                return
+            }
+            
+            libraryModel.thumbnail = model.thumbnail
+            libraryModel.title = model.title
+            libraryModel.user = model.user
+            libraryModel.viewCount = model.viewCount
+            libraryModel.id = model.id
+            libraryModel.url = model.url
+            libraryModel.isInLibrary = model.isInLibrary
+            libraryModel.dateAdded = Date()
+            
+            self.appDelegate.saveContext()
+        }
+    }
     
 }
