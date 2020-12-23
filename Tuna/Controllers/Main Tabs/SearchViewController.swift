@@ -17,7 +17,7 @@ class SearchViewController: UIViewController {
     
     // MARK:- Create UI
     
-    private let searchBar: UISearchBar = {
+    public let searchBar: UISearchBar = {
         let searchBar = UISearchBar()
         searchBar.backgroundColor = .systemBackground
         searchBar.autocapitalizationType = .none
@@ -131,7 +131,10 @@ class SearchViewController: UIViewController {
             style: .default,
             handler: { action in
                 // Present search history view controller
-                
+                let vc = SearchHistoryViewController()
+                vc.delegate = self
+                vc.title = "Search history"
+                self.navigationController?.pushViewController(vc, animated: true)
         }))
         
         actionSheet.addAction(UIAlertAction(
@@ -281,6 +284,15 @@ extension SearchViewController: UISearchBarDelegate {
         guard let text = searchBar.text, !text.isEmpty else {
             return
         }
+        let searchHistoryModel = SearchHistoryModel(
+            entity: SearchHistoryModel.entity(),
+            insertInto: context
+        )
+        searchHistoryModel.text = text
+        searchHistoryModel.dateAdded = Date()
+        
+        self.appDelegate.saveContext()
+        
         query(with: text)
         
     }
@@ -524,6 +536,15 @@ extension SearchViewController: YoutubePlayerViewControllerDelegate {
         
         
         
+    }
+    
+    
+}
+
+extension SearchViewController: SearchHistoryViewControllerDelegate {
+    func didTapSearchHistoryResult(with text: String) {
+        searchBar.text = text
+        query(with: text)
     }
     
     

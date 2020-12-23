@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="16119" systemVersion="19F101" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="SearchHistoryModel" representedClassName=".SearchHistoryModel" syncable="YES">
+        <attribute name="dateAdded" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="text" attributeType="String"/>
+    </entity>
     <entity name="YoutubeLibraryModel" representedClassName=".YoutubeLibraryModel" syncable="YES">
         <attribute name="dateAdded" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="id" attributeType="String"/>
@@ -12,5 +16,6 @@
     </entity>
     <elements>
         <element name="YoutubeLibraryModel" positionX="-63" positionY="-15" width="128" height="163"/>
+        <element name="SearchHistoryModel" positionX="-63" positionY="45" width="128" height="73"/>
     </elements>
 </model>

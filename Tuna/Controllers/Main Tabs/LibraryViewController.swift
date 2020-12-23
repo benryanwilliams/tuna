@@ -42,15 +42,6 @@ class LibraryViewController: UIViewController {
         return view
     }()
     
-    // MARK:- viewWillAppear
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(true)
-        
-        fetchLibraryData(containing: nil)
-
-    }
-    
     // MARK:- viewDidLoad
     
     override func viewDidLoad() {
@@ -85,6 +76,15 @@ class LibraryViewController: UIViewController {
         
     }
     
+    // MARK:- viewWillAppear
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+        
+        fetchLibraryData(containing: nil)
+
+    }
+    
     // MARK:- Config
     
     private func configureSearchBar() {
@@ -95,7 +95,7 @@ class LibraryViewController: UIViewController {
     
     private func configureNavBarMoreButton() {
         navigationItem.rightBarButtonItem = UIBarButtonItem(
-            image: UIImage(systemName: "ellipsis"),
+            image: UIImage(systemName: "line.horizontal.3.decrease"),
             style: .plain,
             target: self,
             action: #selector(didTapNavBarMoreButton)
@@ -121,12 +121,29 @@ class LibraryViewController: UIViewController {
     @objc private func didTapNavBarMoreButton() {
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         actionSheet.addAction(UIAlertAction(
-            title: "Search history",
+            title: "Downloaded",
             style: .default,
             handler: { action in
-                // Present search history view controller
+                // Filter to only show songs that have been downloaded
                 
         }))
+        
+        actionSheet.addAction(UIAlertAction(
+            title: "Not downloaded",
+            style: .default,
+            handler: { action in
+                // Filter to only show songs that haven't been downloaded
+                
+        }))
+        
+        actionSheet.addAction(UIAlertAction(
+            title: "Show all",
+            style: .default,
+            handler: { action in
+                // Filter to show all songs
+                 
+        }))
+        
         
         actionSheet.addAction(UIAlertAction(
             title: "Cancel",
