@@ -97,11 +97,11 @@ class SearchTableViewCell: UITableViewCell {
     }
     
     private func addSubviews() {
-        addSubview(thumbnailImageView)
-        addSubview(titleLabel)
-        addSubview(userLabel)
-        addSubview(viewCountLabel)
-        addSubview(moreButton)
+        contentView.addSubview(thumbnailImageView)
+        contentView.addSubview(titleLabel)
+        contentView.addSubview(userLabel)
+        contentView.addSubview(viewCountLabel)
+        contentView.addSubview(moreButton)
         
     }
     

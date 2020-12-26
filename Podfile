@@ -9,5 +9,8 @@ target 'Tuna' do
 
 pod 'SDWebImage'
 pod 'youtube-ios-player-helper'
+pod 'Alamofire'
+pod 'Spartan'
+pod 'SnapKit'
 
 end

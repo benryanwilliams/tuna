@@ -1,22 +1,47 @@
 PODS:
-  - SDWebImage (5.10.0):
-    - SDWebImage/Core (= 5.10.0)
-  - SDWebImage/Core (5.10.0)
+  - Alamofire (4.9.1)
+  - AlamofireObjectMapper (5.2.1):
+    - Alamofire (~> 4.7)
+    - ObjectMapper (~> 3.4)
+  - AlamoRecord (1.2.2):
+    - AlamofireObjectMapper (~> 5.1)
+  - ObjectMapper (3.5.3)
+  - SDWebImage (5.10.1):
+    - SDWebImage/Core (= 5.10.1)
+  - SDWebImage/Core (5.10.1)
+  - SnapKit (5.0.1)
+  - Spartan (1.2.1):
+    - AlamoRecord (~> 1.2.0)
   - youtube-ios-player-helper (1.0.2)
 
 DEPENDENCIES:
+  - Alamofire
   - SDWebImage
+  - SnapKit
+  - Spartan
   - youtube-ios-player-helper
 
 SPEC REPOS:
   trunk:
+    - Alamofire
+    - AlamofireObjectMapper
+    - AlamoRecord
+    - ObjectMapper
     - SDWebImage
+    - SnapKit
+    - Spartan
     - youtube-ios-player-helper
 
 SPEC CHECKSUMS:
-  SDWebImage: 9169792e9eec3e45bba2a0c02f74bf8bd922d1ee
+  Alamofire: 85e8a02c69d6020a0d734f6054870d7ecb75cf18
+  AlamofireObjectMapper: 1989f690e982b71921b9253f53a4f33a9bc00d88
+  AlamoRecord: 5850c563a811fdca40cd361b1b27622004bccef3
+  ObjectMapper: 97111c97e054a6ee25917662106689f0b4127b37
+  SDWebImage: f66a16b95183b92ed6b965ad21d33167bc07612d
+  SnapKit: 97b92857e3df3a0c71833cce143274bf6ef8e5eb
+  Spartan: 2fb99ad25f2b0e8182799f251c800091977f0a40
   youtube-ios-player-helper: 40b96e52c22445f0fdc43731cefa32c67075ff81
 
-PODFILE CHECKSUM: cd86d2a88c85f5ccb5a8886c5a6006fbe2ced737
+PODFILE CHECKSUM: 0a6d93ed7e0bec1666c34fda66d8b1bc11665dfc
 
 COCOAPODS: 1.10.0.rc.1
