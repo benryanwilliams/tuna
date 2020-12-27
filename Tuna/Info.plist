@@ -46,6 +46,12 @@
             </dict>
         </dict>
     </dict>
+    
+    <key>LSApplicationQueriesSchemes</key>
+    <array>
+        <string>spotify</string>
+    </array>
+    
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

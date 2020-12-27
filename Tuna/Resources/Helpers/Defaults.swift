@@ -9,6 +9,7 @@
 import Foundation
 
 struct Defaults {
+    
     private enum Keys {
         static let onboard = "onboard"
         static let cards = "cards"

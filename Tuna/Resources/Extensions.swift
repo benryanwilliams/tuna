@@ -8,6 +8,8 @@
 
 import UIKit
 
+// MARK:- UIView
+
 extension UIView {
     
     public var width: CGFloat {
@@ -34,6 +36,8 @@ extension UIView {
         return frame.origin.x + frame.size.width
     }
 }
+
+// MARK:- UserDefaults
 
 extension UserDefaults {
     
@@ -74,5 +78,28 @@ extension UserDefaults {
             }
         }
         self.synchronize()
+    }
+}
+
+// MARK:- UIColor
+
+extension UIColor {
+    static let tunaGreen = UIColor(red: 30/255, green: 215/255, blue: 96/255, alpha: 1)
+}
+
+// MARK:- TimeInterval
+
+extension TimeInterval {
+    func asFormattedString() -> String {
+        let mins = self / 60
+        let secs = self.truncatingRemainder(dividingBy: 60)
+        let timeformatter = NumberFormatter()
+        timeformatter.minimumIntegerDigits = 2
+        timeformatter.minimumFractionDigits = 0
+        timeformatter.roundingMode = .down
+        guard let minsStr = timeformatter.string(from: NSNumber(value: mins)), let secsStr = timeformatter.string(from: NSNumber(value: secs)) else {
+            return ""
+        }
+        return "\(minsStr):\(secsStr)"
     }
 }

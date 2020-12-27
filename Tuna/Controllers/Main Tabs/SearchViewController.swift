@@ -7,13 +7,23 @@
 //
 
 import UIKit
+import Spartan
 
 class SearchViewController: UIViewController {
     
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
-    public var models = [YoutubeVideoModel]()
+    public var youtubeModels = [YoutubeVideoModel]()
+    public var spotifyModels = [SpotifyTrackModel]()
+    
+    /// State management for header tabs
+    private enum HeaderTab {
+        case spotifySelected
+        case youtubeSelected
+    }
+    
+    private var headerTab: HeaderTab = .youtubeSelected
     
     // MARK:- Create UI
     
@@ -74,8 +84,10 @@ class SearchViewController: UIViewController {
         
         configureDimmedView()
         
+        // MARK:- Test Models
+        
         // TEST: Add testModels to model array
-        let testModel = YoutubeVideoModel(
+        let youtubeTestModel = YoutubeVideoModel(
             thumbnail: "https://i.ytimg.com/vi/zMsnnH7Tu34/mqdefault.jpg",
             title: "Galt MacDermot - Coffe Cold",
             user: "xamarufter",
@@ -86,7 +98,22 @@ class SearchViewController: UIViewController {
         )
         
         for _ in 0..<10 {
-            models.append(testModel)
+            youtubeModels.append(youtubeTestModel)
+        }
+        
+        // TEST: Add testModels to model array
+        let spotifyTestModel = SpotifyTrackModel(
+            thumbnail: "https://i.scdn.co/image/ab67616d0000b273db1083f417644e3e1cf47543",
+            artist: "Leon Vynehall",
+            title: "Nothing Is Still",
+            trackLength: "8 mins",
+            id: "6WeIO0CpDMiMXTglv0KuLr",
+            url: "spotify:album:6WeIO0CpDMiMXTglv0KuLr",
+            isInLibrary: false
+        )
+        
+        for _ in 0..<10 {
+            spotifyModels.append(spotifyTestModel)
         }
         
     }
@@ -127,20 +154,20 @@ class SearchViewController: UIViewController {
     @objc private func didTapNavBarMoreButton() {
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         actionSheet.addAction(UIAlertAction(
-            title: "Search history",
-            style: .default,
-            handler: { action in
-                // Present search history view controller
-                let vc = SearchHistoryViewController()
-                vc.delegate = self
-                vc.title = "Search history"
-                self.navigationController?.pushViewController(vc, animated: true)
-        }))
+                                title: "Search history",
+                                style: .default,
+                                handler: { action in
+                                    // Present search history view controller
+                                    let vc = SearchHistoryViewController()
+                                    vc.delegate = self
+                                    vc.title = "Search history"
+                                    self.navigationController?.pushViewController(vc, animated: true)
+                                }))
         
         actionSheet.addAction(UIAlertAction(
-            title: "Cancel",
-            style: .cancel,
-            handler: nil))
+                                title: "Cancel",
+                                style: .cancel,
+                                handler: nil))
         
         actionSheet.view.tintColor = .label
         
@@ -171,7 +198,7 @@ class SearchViewController: UIViewController {
     
     // MARK:- Youtube API Integration
     
-    private func getData(from urlString: String) {
+    private func getYoutubeData(from urlString: String) {
         
         var videoIds = [String]()
         
@@ -246,14 +273,14 @@ class SearchViewController: UIViewController {
                 // Append each video's details to the models array
                 for item in json.items {
                     guard let thumbnailURL = item.snippet?.thumbnails?.medium?.url,
-                        let title = item.snippet?.title,
-                        let user = item.snippet?.channelTitle,
-                        let count = item.statistics?.viewCount,
-                        let id = item.id.idString else {
+                          let title = item.snippet?.title,
+                          let user = item.snippet?.channelTitle,
+                          let count = item.statistics?.viewCount,
+                          let id = item.id.idString else {
                         return
                     }
                     
-                    self.models.append(YoutubeVideoModel(
+                    self.youtubeModels.append(YoutubeVideoModel(
                         thumbnail: thumbnailURL,
                         title: title,
                         user: user,
@@ -261,7 +288,7 @@ class SearchViewController: UIViewController {
                         id: id,
                         url: "https://www.youtube.com/watch?v=\(id)",
                         isInLibrary: false
-                        )
+                    )
                     )
                 }
                 
@@ -272,6 +299,61 @@ class SearchViewController: UIViewController {
             task.resume()
         }
         task.resume()
+    }
+    
+    // MARK:- Spotify API Integration
+    
+    private func getSpotifyData(with text: String) {
+        
+        // Query based on search
+        _ = Spartan.search(query: text, type: .track, success: { (pagingObject: PagingObject<SimplifiedTrack>) in
+            
+            // Get the tracks via pagingObject.items
+            for item in pagingObject.items {
+                
+                var albumId = ""
+                
+                // Get track information
+                _ = Spartan.getTrack(id: item.id as! String, market: .gb, success: { (track) in
+                    
+                    guard let artist = track.artists[0].name,
+                          let title = track.name,
+                          let id = track.id,
+                          let url = track.uri else {
+                        return
+                    }
+                    
+                    albumId = track.id as! String
+
+                    // Get image for track
+                    _ = Spartan.getAlbum(id: albumId, market: .us, success: { (album) in
+                        // Get image for track
+                        guard let thumbnail = album.images.first?.url else {
+                            return
+                        }
+
+                        self.spotifyModels.append(SpotifyTrackModel(
+                                                thumbnail: thumbnail,
+                                                artist: artist,
+                                                title: title,
+                                                trackLength: "10 mins",
+                                                id: "\(id)",
+                                                url: url,
+                                                isInLibrary: false
+                        ))
+                        
+                    }, failure: { (error) in
+                        print(error)
+                    })
+
+                }, failure: { (error) in
+                    print(error)
+                })
+                
+            }
+        }, failure: { (error) in
+            print(error)
+        })
     }
 }
 
@@ -348,16 +430,29 @@ extension SearchViewController: UISearchBarDelegate {
     }
     
     private func query(with text: String) {
-        // Perform YouTube search with text
-        models = [YoutubeVideoModel]()
+        if headerTab == .youtubeSelected {
+            
+            // Perform YouTube search with text
+            youtubeModels = [YoutubeVideoModel]()
+            
+            let queryString = text.replacingOccurrences(of: " ", with: "+")
+            
+            let baseUrlString = "https://youtube.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=25"
+            let apiString = "key=\(Secrets.youtubeAPIKey)"
+            let urlString = "\(baseUrlString)&q=\(queryString)&\(apiString)"
+            
+            getYoutubeData(from: urlString)
+        }
         
-        let queryString = text.replacingOccurrences(of: " ", with: "+")
+        else if headerTab == .spotifySelected {
+            
+            // Perform Spotify search with text
+            spotifyModels = [SpotifyTrackModel]()
+            
+            getSpotifyData(with: text)
+            
+        }
         
-        let baseUrlString = "https://youtube.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=25"
-        let apiString = "key=\(Secrets.youtubeAPIKey)"
-        let urlString = "\(baseUrlString)&q=\(queryString)&\(apiString)"
-        
-        getData(from: urlString)
     }
     
 }
@@ -367,16 +462,16 @@ extension SearchViewController: UISearchBarDelegate {
 extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        models.count
+        youtubeModels.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: SearchTableViewCell.identifier, for: indexPath) as! SearchTableViewCell
         cell.delegate = self
-        guard !models.isEmpty else {
+        guard !youtubeModels.isEmpty else {
             return UITableViewCell()
         }
-        let model = models[indexPath.row]
+        let model = youtubeModels[indexPath.row]
         cell.configure(with: model)
         return cell
     }
@@ -384,7 +479,7 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let vc = YoutubePlayerViewController()
         vc.delegate = self
-        vc.model = models[indexPath.row]
+        vc.model = youtubeModels[indexPath.row]
         navigationController?.pushViewController(vc, animated: true)
         print("cell pressed")
     }
@@ -420,17 +515,24 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
 extension SearchViewController: YoutubeSpotifyHeaderViewDelegate {
     func didTapYoutubeButton() {
         // Open Youtube search results
+        headerTab = .youtubeSelected
+        
+        print(spotifyModels)
     }
     
     func didTapSpotifyButton() {
         // Open Spotify search results
+        
+        // Set state
+        headerTab = .spotifySelected
+        
+        getSpotifyData(with: "Leon Vynehall")
+    
     }
-    
-    
 }
 
 // MARK:- moreButtonDelegate Methods
-    
+
 extension SearchViewController: MoreButtonDelegate {
     func didTapMoreButton(cell: SearchTableViewCell) {
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
@@ -439,33 +541,33 @@ extension SearchViewController: MoreButtonDelegate {
             print("Error: could not retrieve index path")
             return
         }
-        let model = models[indexPath.row]
+        let model = youtubeModels[indexPath.row]
         print(model)
         
         // TODO:- Add 'if' statement here so that if the video is already in the library then it says 'Remove from library' (also make this style .destructive so that it is red), otherwise it should say 'Add to library'
         
         actionSheet.addAction(UIAlertAction(
-            title: "Add to library",
-            style: .default,
-            handler: { action in
-                // Add to array of models within library and save to context
-                self.addToLibrary(at: indexPath)
-                
-        }))
+                                title: "Add to library",
+                                style: .default,
+                                handler: { action in
+                                    // Add to array of models within library and save to context
+                                    self.addToLibrary(at: indexPath)
+                                    
+                                }))
         
         actionSheet.addAction(UIAlertAction(
-            title: "Copy link",
-            style: .default,
-            handler: { action in
-                // Fetch video url and add to clipboard
-                let pasteboard = UIPasteboard.general
-                pasteboard.string = model.url
-        }))
+                                title: "Copy link",
+                                style: .default,
+                                handler: { action in
+                                    // Fetch video url and add to clipboard
+                                    let pasteboard = UIPasteboard.general
+                                    pasteboard.string = model.url
+                                }))
         
         actionSheet.addAction(UIAlertAction(
-            title: "Cancel",
-            style: .cancel,
-            handler: nil))
+                                title: "Cancel",
+                                style: .cancel,
+                                handler: nil))
         
         actionSheet.view.tintColor = .label
         
@@ -474,7 +576,7 @@ extension SearchViewController: MoreButtonDelegate {
     }
     
     private func addToLibrary(at indexPath: IndexPath) {
-        let selectedModel = self.models[indexPath.row]
+        let selectedModel = self.youtubeModels[indexPath.row]
         
         let libraryModel = YoutubeLibraryModel(
             entity: YoutubeLibraryModel.entity(),
@@ -533,11 +635,8 @@ extension SearchViewController: YoutubePlayerViewControllerDelegate {
             
             self.addToLibrary(at: indexPath)
         }
-        
-        
-        
+   
     }
-    
     
 }
 

@@ -31,17 +31,19 @@ class LoginController: UIViewController {
         let label = UILabel()
         label.text = "Connect your Spotify account"
         label.font = UIFont.systemFont(ofSize: 20, weight: .bold)
-        label.backgroundColor = UIColor(red: 30/255, green: 215/255, blue: 96/255, alpha: 1)
+        label.textAlignment = .center
+        label.backgroundColor = .systemBackground
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     private let connectButton: UIButton = {
         let button = UIButton()
-        button.backgroundColor = UIColor(red: 30/255, green: 215/255, blue: 96/255, alpha: 1)
+        button.backgroundColor = .tunaGreen
         button.translatesAutoresizingMaskIntoConstraints = false
         button.contentEdgeInsets = UIEdgeInsets(top: 11.75, left: 32.0, bottom: 11.75, right: 32.0)
         button.layer.cornerRadius = 20.0
         button.setTitle("Continue with Spotify", for: .normal)
+        button.setTitleColor(.systemBackground, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 20, weight: .bold)
         button.sizeToFit()
         button.addTarget(self, action: #selector(didTapConnect(_:)), for: .touchUpInside)
@@ -49,7 +51,7 @@ class LoginController: UIViewController {
     }()
     private let disconnectButton: UIButton = {
         let button = UIButton()
-        button.backgroundColor = UIColor(red: 30/255, green: 215/255, blue: 96/255, alpha: 1)
+        button.backgroundColor = .tunaGreen
         button.translatesAutoresizingMaskIntoConstraints = false
         button.contentEdgeInsets = UIEdgeInsets(top: 11.75, left: 32.0, bottom: 11.75, right: 32.0)
         button.layer.cornerRadius = 20.0
@@ -59,34 +61,12 @@ class LoginController: UIViewController {
         button.addTarget(self, action: #selector(didTapDisconnect(_:)), for: .touchUpInside)
         return button
     }()
-    private let pauseAndPlayButton: UIButton = {
-        let button = UIButton()
-        button.addTarget(self, action: #selector(didTapPauseOrPlay), for: .touchUpInside)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.sizeToFit()
-        return button
-    }()
-    private let imageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.contentMode = .scaleAspectFit
-        return imageView
-    }()
-    private let trackLabel: UILabel = {
-        let trackLabel = UILabel()
-        trackLabel.translatesAutoresizingMaskIntoConstraints = false
-        trackLabel.textColor = .black
-        trackLabel.font = UIFont.systemFont(ofSize: 18, weight: .medium)
-        trackLabel.textAlignment = .center
-        return trackLabel
-    }()
 
     //MARK: App Life Cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
-//        transparentNavigationBar()
         setCodeVerifier()
     }
     
@@ -101,38 +81,7 @@ class LoginController: UIViewController {
         view.addSubview(connectLabel)
         view.addSubview(connectButton)
         view.addSubview(disconnectButton)
-        view.addSubview(imageView)
-        view.addSubview(trackLabel)
-        view.addSubview(pauseAndPlayButton)
-        let constant: CGFloat = 16.0
-//        connectButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-//        connectButton.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
-        connectButton.snp.makeConstraints {
-            $0.centerX.equalToSuperview()
-            $0.centerY.equalToSuperview().multipliedBy(1.4)
-            $0.width.equalToSuperview().multipliedBy(0.8)
-            $0.height.equalTo(50)
-        }
-//        disconnectButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-//        disconnectButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -50).isActive = true
-        disconnectButton.snp.makeConstraints {
-            $0.centerX.equalToSuperview()
-            $0.centerY.equalToSuperview().multipliedBy(1.4)
-            $0.width.equalToSuperview().multipliedBy(0.8)
-            $0.height.equalTo(50)
-        }
-        connectLabel.centerXAnchor.constraint(equalTo: connectButton.centerXAnchor).isActive = true
-        connectLabel.bottomAnchor.constraint(equalTo: connectButton.topAnchor, constant: -constant).isActive = true
-        imageView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        imageView.topAnchor.constraint(equalTo: view.topAnchor, constant: 64).isActive = true
-        imageView.bottomAnchor.constraint(equalTo: trackLabel.topAnchor, constant: -constant).isActive = true
-        trackLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        trackLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: constant).isActive = true
-        trackLabel.bottomAnchor.constraint(equalTo: connectLabel.topAnchor, constant: -constant).isActive = true
-        pauseAndPlayButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        pauseAndPlayButton.topAnchor.constraint(equalTo: trackLabel.bottomAnchor, constant: constant).isActive = true
-        pauseAndPlayButton.widthAnchor.constraint(equalToConstant: 50).isActive = true
-        pauseAndPlayButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
+
         updateViewBasedOnConnected()
     }
     
@@ -144,56 +93,17 @@ class LoginController: UIViewController {
         let codeChallengeMethod = Data(digestString.utf8).base64EncodedString()
         codeVerifier = codeChallengeMethod
     }
-    
-    func update(playerState: SPTAppRemotePlayerState) {
-        if lastPlayerState?.track.uri != playerState.track.uri {
-            fetchArtwork(for: playerState.track)
-        }
-        lastPlayerState = playerState
-        trackLabel.text = playerState.track.name
-        if playerState.isPaused {
-            pauseAndPlayButton.setImage(UIImage(named: "playButton"), for: .normal)
-        } else {
-            pauseAndPlayButton.setImage(UIImage(named: "pauseButton"), for: .normal)
-        }
-    }
 
     func updateViewBasedOnConnected() {
         if appRemote.isConnected == true {
             connectButton.isHidden = true
             disconnectButton.isHidden = false
             connectLabel.isHidden = true
-            imageView.isHidden = false
-            trackLabel.isHidden = false
-            pauseAndPlayButton.isHidden = false
         } else { //show login
             disconnectButton.isHidden = true
             connectButton.isHidden = false
             connectLabel.isHidden = false
-            imageView.isHidden = true
-            trackLabel.isHidden = true
-            pauseAndPlayButton.isHidden = true
         }
-    }
-
-    func fetchArtwork(for track: SPTAppRemoteTrack) {
-        appRemote.imageAPI?.fetchImage(forItem: track, with: CGSize.zero, callback: { [weak self] (image, error) in
-            if let error = error {
-                print("Error fetching track image: " + error.localizedDescription)
-            } else if let image = image as? UIImage {
-                self?.imageView.image = image
-            }
-        })
-    }
-
-    func fetchPlayerState() {
-        appRemote.playerAPI?.getPlayerState({ [weak self] (playerState, error) in
-            if let error = error {
-                print("Error getting player state:" + error.localizedDescription)
-            } else if let playerState = playerState as? SPTAppRemotePlayerState {
-                self?.update(playerState: playerState)
-            }
-        })
     }
 
     // MARK: - Actions
@@ -228,7 +138,6 @@ class LoginController: UIViewController {
     ///fetch access token and fetch user
     func fetchSpotifyAccessToken() {
         guard let _ = NetworkManager.authorizationCode else { return } //makes sure we have authorization code
-//        startActivityIndicator()
         appRemote.connect() //connect appRemote to pause Spotify
         //fetch access token
         NetworkManager.fetchAccessToken { (result) in
@@ -263,21 +172,48 @@ class LoginController: UIViewController {
             }
         }
     }
+    
+    // MARK:- viewDidLayoutSubviews
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        let buttonWidth = view.width * 0.8
+        let buttonHeight: CGFloat = 50
+        let bufferSize: CGFloat = 20
+        
+        connectLabel.frame = CGRect(
+            x: (view.width - buttonWidth) / 2,
+            y: (view.height - (buttonHeight * 2) - bufferSize) / 2,
+            width: buttonWidth,
+            height: buttonHeight
+        )
+        
+        connectButton.frame = CGRect(
+            x: (view.width - buttonWidth) / 2,
+            y: (connectLabel.bottom + bufferSize),
+            width: buttonWidth,
+            height: buttonHeight
+        )
+        
+        disconnectButton.frame = CGRect(
+            x: (view.width - buttonWidth) / 2,
+            y: (connectLabel.bottom + bufferSize),
+            width: buttonWidth,
+            height: buttonHeight
+        )
+    }
+
+    
 }
+
+
 
 // MARK: - SPTAppRemoteDelegate
 extension LoginController: SPTAppRemoteDelegate {
     func appRemoteDidEstablishConnection(_ appRemote: SPTAppRemote) {
         self.appRemote.playerAPI?.pause(nil)
         self.appRemote.disconnect()
-//        updateViewBasedOnConnected()
-//        appRemote.playerAPI?.delegate = self
-//        appRemote.playerAPI?.subscribe(toPlayerState: { (success, error) in
-//            if let error = error {
-//                print("Error subscribing to player state:" + error.localizedDescription)
-//            }
-//        })
-//        fetchPlayerState()
     }
 
     func appRemote(_ appRemote: SPTAppRemote, didDisconnectWithError error: Error?) {
@@ -295,7 +231,7 @@ extension LoginController: SPTAppRemoteDelegate {
 extension LoginController: SPTAppRemotePlayerStateDelegate {
     func playerStateDidChange(_ playerState: SPTAppRemotePlayerState) {
         debugPrint("Spotify Track name: %@", playerState.track.name)
-        update(playerState: playerState)
+        
     }
 }
 

@@ -10,11 +10,12 @@ import Foundation
 import Spartan
 
 class NetworkManager {
-    //make it singleton
     public static let shared = NetworkManager()
+    
     private init() {}
-    //properties
-    static let urlSession = URLSession.shared // shared singleton session object used to run tasks. Will be useful later
+
+    static let urlSession = URLSession.shared // shared singleton session object used to run tasks
+    
     static private let baseURL = "https://accounts.spotify.com/"
     static private var parameters: [String: String] = [:]
     static let clientId = Secrets.spotifyClientId
@@ -74,6 +75,8 @@ class NetworkManager {
                     self.authorizationCode = nil
 //                    self.refreshToken = spotifyAuth.refreshToken
                     Spartan.authorizationToken = spotifyAuth.accessToken
+                    print(spotifyAuth.accessToken)
+                    
                     return completion(.success(spotifyAuth))
                 }
                 completion(.failure(EndPointError.couldNotParse(message: "Failed to decode data")))
