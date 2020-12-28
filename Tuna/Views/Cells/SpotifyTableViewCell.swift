@@ -1,62 +1,63 @@
 //
-//  SearchTableViewCell.swift
+//  SpotifyTableViewCell.swift
 //  Tuna
 //
-//  Created by Ben Williams on 07/12/2020.
+//  Created by Ben Williams on 29/12/2020.
 //  Copyright © 2020 Ben Williams. All rights reserved.
 //
 
 import SDWebImage
 import UIKit
 
-protocol MoreButtonDelegate: AnyObject {
-    func didTapMoreButton(cell: SearchTableViewCell)
+protocol SpotifyMoreButtonDelegate: AnyObject {
+    func didTapSpotifyMoreButton(cell: SpotifyTableViewCell)
 }
 
-class SearchTableViewCell: UITableViewCell {
-    static let identifier = "SearchTableViewCell"
+class SpotifyTableViewCell: UITableViewCell {
+    static let identifier = "SpotifyTableViewCell"
     
-    weak var delegate: MoreButtonDelegate?
+    weak var delegate: SpotifyMoreButtonDelegate?
     
-    private var model: YoutubeVideoModel?
+    private var model: SpotifyTrackModel?
     
     // MARK:- Create UI
     
     private let thumbnailImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
-        imageView.image = UIImage(named: "test")
+        imageView.image = UIImage(named: "spotifyTest")
+        imageView.clipsToBounds = true
         return imageView
     }()
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Galt McDermott - Coffee Cold"
+        label.text = "Midnight on Rainbow Road"
         label.textColor = .label
         label.numberOfLines = 2
+        label.font = .systemFont(ofSize: 18, weight: .regular)
+        return label
+    }()
+    
+    private let artistLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Leon Vynehall"
+        label.textColor = .tunaGreen
+        label.numberOfLines = 1
         label.font = .systemFont(ofSize: 14, weight: .regular)
         return label
     }()
     
-    private let userLabel: UILabel = {
+    private let durationLabel: UILabel = {
         let label = UILabel()
-        label.text = "sinextransum"
+        label.text = "3:20"
         label.textColor = .secondaryLabel
         label.numberOfLines = 1
-        label.font = .systemFont(ofSize: 12, weight: .regular)
+        label.font = .systemFont(ofSize: 14, weight: .regular)
         return label
     }()
     
-    private let viewCountLabel: UILabel = {
-        let label = UILabel()
-        label.text = "568,765 views"
-        label.textColor = .secondaryLabel
-        label.numberOfLines = 1
-        label.font = .systemFont(ofSize: 12, weight: .regular)
-        return label
-    }()
-    
-    private let moreButton: UIButton = {
+    private let spotifyMoreButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(systemName: "ellipsis"), for: .normal)
         button.tintColor = .secondaryLabel
@@ -72,7 +73,7 @@ class SearchTableViewCell: UITableViewCell {
         clipsToBounds = true
         
         addSubviews()
-        moreButton.addTarget(self, action: #selector(didTapMoreButton), for: .touchUpInside)
+        spotifyMoreButton.addTarget(self, action: #selector(didTapSpotifyMoreButton), for: .touchUpInside)
     }
     
     required init?(coder: NSCoder) {
@@ -81,27 +82,27 @@ class SearchTableViewCell: UITableViewCell {
     
     // MARK:- Actions
     
-    public func configure(with model: YoutubeVideoModel) {
+    public func configure(with model: SpotifyTrackModel) {
         // Configure cell, e.g. viewCountLabel.text = model.viewCount
         guard let thumbnailURL = URL(string: model.thumbnail) else {
             return
         }
         thumbnailImageView.sd_setImage(with: thumbnailURL, completed: nil)
         titleLabel.text = model.title
-        userLabel.text = model.user
-        viewCountLabel.text = String(model.viewCount)
+        artistLabel.text = model.artist
+        durationLabel.text = String(model.trackLength)
     }
     
-    @objc private func didTapMoreButton() {
-        delegate?.didTapMoreButton(cell: self)
+    @objc private func didTapSpotifyMoreButton() {
+        delegate?.didTapSpotifyMoreButton(cell: self)
     }
     
     private func addSubviews() {
         contentView.addSubview(thumbnailImageView)
         contentView.addSubview(titleLabel)
-        contentView.addSubview(userLabel)
-        contentView.addSubview(viewCountLabel)
-        contentView.addSubview(moreButton)
+        contentView.addSubview(artistLabel)
+        contentView.addSubview(durationLabel)
+        contentView.addSubview(spotifyMoreButton)
         
     }
     
@@ -111,15 +112,16 @@ class SearchTableViewCell: UITableViewCell {
         super.layoutSubviews()
         
         let bufferSize: CGFloat = 18
+        let thumbnailSize: CGFloat = contentView.height - bufferSize
         
         thumbnailImageView.frame = CGRect(
-            x: bufferSize * 2,
+            x: bufferSize,
             y: bufferSize / 2,
-            width: (contentView.width - (bufferSize * 2)) / 3,
-            height: contentView.height - (bufferSize)
+            width: thumbnailSize,
+            height: thumbnailSize
         )
         
-        moreButton.frame = CGRect(
+        spotifyMoreButton.frame = CGRect(
             x: contentView.right - 30 - bufferSize,
             y: 0,
             width: 40,
@@ -127,24 +129,24 @@ class SearchTableViewCell: UITableViewCell {
         )
         
         titleLabel.frame = CGRect(
-            x: thumbnailImageView.right + (bufferSize * 1.75),
+            x: thumbnailImageView.right + bufferSize,
             y: bufferSize / 2,
-            width: contentView.width - (bufferSize * 5.5) - thumbnailImageView.width - moreButton.width,
+            width: contentView.width - (bufferSize * 5.5) - thumbnailImageView.width - spotifyMoreButton.width,
             height: (contentView.height - (bufferSize * 2)) / 2
         )
         titleLabel.sizeToFit()
         
-        userLabel.frame = CGRect(
-            x: thumbnailImageView.right + (bufferSize * 1.75),
+        artistLabel.frame = CGRect(
+            x: thumbnailImageView.right + bufferSize,
             y: titleLabel.bottom,
-            width: contentView.width - (bufferSize * 5.5) - thumbnailImageView.width - moreButton.width,
+            width: contentView.width - (bufferSize * 5.5) - thumbnailImageView.width - spotifyMoreButton.width,
             height: (contentView.height - (bufferSize * 2)) / 4
         )
         
-        viewCountLabel.frame = CGRect(
-            x: thumbnailImageView.right + (bufferSize * 1.75),
-            y: userLabel.bottom,
-            width: contentView.width - (bufferSize * 5.5) - thumbnailImageView.width - moreButton.width,
+        durationLabel.frame = CGRect(
+            x: thumbnailImageView.right + bufferSize,
+            y: artistLabel.bottom,
+            width: contentView.width - (bufferSize * 5.5) - thumbnailImageView.width - spotifyMoreButton.width,
             height: (contentView.height - (bufferSize * 2)) / 4
         )
     }

@@ -85,6 +85,7 @@ extension UserDefaults {
 
 extension UIColor {
     static let tunaGreen = UIColor(red: 30/255, green: 215/255, blue: 96/255, alpha: 1)
+    static let youtubeRed = UIColor(red: 1, green: 0, blue: 0, alpha: 1)
 }
 
 // MARK:- TimeInterval

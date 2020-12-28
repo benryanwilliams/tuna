@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		6331AAF12580B3CA0028BA34 /* YoutubeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6331AAF02580B3CA0028BA34 /* YoutubeModel.swift */; };
 		6331AAF32580D1FA0028BA34 /* YoutubeVideoModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6331AAF22580D1FA0028BA34 /* YoutubeVideoModel.swift */; };
+		63342F84259A4A710019F951 /* SpotifyTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63342F83259A4A710019F951 /* SpotifyTableViewCell.swift */; };
+		63342F87259A4E8B0019F951 /* SpotifyPlayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63342F86259A4E8B0019F951 /* SpotifyPlayerViewController.swift */; };
 		635CEE68259319E700549DC3 /* SearchHistoryModel+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 635CEE66259319E700549DC3 /* SearchHistoryModel+CoreDataClass.swift */; };
 		635CEE69259319E700549DC3 /* SearchHistoryModel+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 635CEE67259319E700549DC3 /* SearchHistoryModel+CoreDataProperties.swift */; };
 		635D62862595C7E100B82897 /* SpotifyiOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 635D62852595C7E100B82897 /* SpotifyiOS.framework */; };
@@ -49,6 +51,8 @@
 		3793DACEEA0AC4473FBE2140 /* Pods-Tuna.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Tuna.release.xcconfig"; path = "Target Support Files/Pods-Tuna/Pods-Tuna.release.xcconfig"; sourceTree = "<group>"; };
 		6331AAF02580B3CA0028BA34 /* YoutubeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YoutubeModel.swift; sourceTree = "<group>"; };
 		6331AAF22580D1FA0028BA34 /* YoutubeVideoModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YoutubeVideoModel.swift; sourceTree = "<group>"; };
+		63342F83259A4A710019F951 /* SpotifyTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyTableViewCell.swift; sourceTree = "<group>"; };
+		63342F86259A4E8B0019F951 /* SpotifyPlayerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyPlayerViewController.swift; sourceTree = "<group>"; };
 		635CEE66259319E700549DC3 /* SearchHistoryModel+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SearchHistoryModel+CoreDataClass.swift"; sourceTree = "<group>"; };
 		635CEE67259319E700549DC3 /* SearchHistoryModel+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SearchHistoryModel+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		635D62852595C7E100B82897 /* SpotifyiOS.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SpotifyiOS.framework; sourceTree = "<group>"; };
@@ -177,6 +181,7 @@
 			children = (
 				635D94B3257CF86300974B78 /* SearchHistoryViewController.swift */,
 				63EF5BF52583E2EB00B8EC34 /* YoutubePlayerViewController.swift */,
+				63342F86259A4E8B0019F951 /* SpotifyPlayerViewController.swift */,
 				63E9DF8B2598EE8A009572E1 /* PlayerView.swift */,
 				63E9DF8C2598EE8A009572E1 /* PlayerView.xib */,
 			);
@@ -213,6 +218,7 @@
 			children = (
 				6379254E257E7A1100B096F8 /* SearchTableViewCell.swift */,
 				63E9DF932598EFD4009572E1 /* TrackCell.swift */,
+				63342F83259A4A710019F951 /* SpotifyTableViewCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -427,6 +433,7 @@
 			files = (
 				635D94AD257CF80D00974B78 /* SearchViewController.swift in Sources */,
 				6368495D258E5CB8004C9B26 /* Tuna.xcdatamodeld in Sources */,
+				63342F87259A4E8B0019F951 /* SpotifyPlayerViewController.swift in Sources */,
 				635CEE69259319E700549DC3 /* SearchHistoryModel+CoreDataProperties.swift in Sources */,
 				63C827FD2597E373002F35E9 /* NetworkManager.swift in Sources */,
 				63C828282597F006002F35E9 /* User.swift in Sources */,
@@ -446,6 +453,7 @@
 				63C828032597E41D002F35E9 /* SpotifyAuth.swift in Sources */,
 				63EF5BF62583E2EB00B8EC34 /* YoutubePlayerViewController.swift in Sources */,
 				637E9BBB257D4620004A9864 /* Extensions.swift in Sources */,
+				63342F84259A4A710019F951 /* SpotifyTableViewCell.swift in Sources */,
 				63DADEF2257FD579009D9105 /* SecretsTemplate.swift in Sources */,
 				635D94B1257CF83100974B78 /* LoginController.swift in Sources */,
 				635D94AF257CF81E00974B78 /* LibraryViewController.swift in Sources */,

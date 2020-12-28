@@ -16,5 +16,6 @@ struct SpotifyTrackModel {
     let id: String
     let url: String
     let isInLibrary: Bool
+    let previewUrl: String?
     
 }

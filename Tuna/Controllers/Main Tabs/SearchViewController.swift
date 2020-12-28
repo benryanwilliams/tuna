@@ -41,6 +41,7 @@ class SearchViewController: UIViewController {
         let tableView = UITableView()
         tableView.backgroundColor = .secondarySystemBackground
         tableView.register(SearchTableViewCell.self, forCellReuseIdentifier: SearchTableViewCell.identifier)
+        tableView.register(SpotifyTableViewCell.self, forCellReuseIdentifier: SpotifyTableViewCell.identifier)
         return tableView
     }()
     
@@ -102,19 +103,19 @@ class SearchViewController: UIViewController {
         }
         
         // TEST: Add testModels to model array
-        let spotifyTestModel = SpotifyTrackModel(
-            thumbnail: "https://i.scdn.co/image/ab67616d0000b273db1083f417644e3e1cf47543",
-            artist: "Leon Vynehall",
-            title: "Nothing Is Still",
-            trackLength: "8 mins",
-            id: "6WeIO0CpDMiMXTglv0KuLr",
-            url: "spotify:album:6WeIO0CpDMiMXTglv0KuLr",
-            isInLibrary: false
-        )
-        
-        for _ in 0..<10 {
-            spotifyModels.append(spotifyTestModel)
-        }
+        //        let spotifyTestModel = SpotifyTrackModel(
+        //            thumbnail: "https://i.scdn.co/image/ab67616d0000b273db1083f417644e3e1cf47543",
+        //            artist: "Leon Vynehall",
+        //            title: "Nothing Is Still",
+        //            trackLength: "8 mins",
+        //            id: "6WeIO0CpDMiMXTglv0KuLr",
+        //            url: "spotify:album:6WeIO0CpDMiMXTglv0KuLr",
+        //            isInLibrary: false
+        //        )
+        //
+        //        for _ in 0..<10 {
+        //            spotifyModels.append(spotifyTestModel)
+        //        }
         
     }
     
@@ -311,41 +312,50 @@ class SearchViewController: UIViewController {
             // Get the tracks via pagingObject.items
             for item in pagingObject.items {
                 
-                var albumId = ""
+                guard let artist = item.artists[0].name,
+                      let title = item.name,
+                      let id = item.id,
+                      let duration = item.durationMs,
+                      let uri = item.uri else {
+                    return
+                }
+                
+                guard let previewUrl = item.previewUrl else {
+                    return
+                }
                 
                 // Get track information
                 _ = Spartan.getTrack(id: item.id as! String, market: .gb, success: { (track) in
                     
-                    guard let artist = track.artists[0].name,
-                          let title = track.name,
-                          let id = track.id,
-                          let url = track.uri else {
-                        return
-                    }
+                    // Get album id of track
+                    let albumId = track.id as! String
                     
-                    albumId = track.id as! String
-
                     // Get image for track
-                    _ = Spartan.getAlbum(id: albumId, market: .us, success: { (album) in
-                        // Get image for track
+                    _ = Spartan.getAlbum(id: albumId, market: .gb, success: { (album) in
                         guard let thumbnail = album.images.first?.url else {
                             return
                         }
-
+                        
                         self.spotifyModels.append(SpotifyTrackModel(
-                                                thumbnail: thumbnail,
-                                                artist: artist,
-                                                title: title,
-                                                trackLength: "10 mins",
-                                                id: "\(id)",
-                                                url: url,
-                                                isInLibrary: false
+                            thumbnail: thumbnail,
+                            artist: artist,
+                            title: title,
+                            trackLength: "\(duration)",
+                            id: "\(id)",
+                            url: uri,
+                            isInLibrary: false,
+                            previewUrl: previewUrl
                         ))
+                        
+                        DispatchQueue.main.async {
+                            self.tableView.reloadData()
+                        }
                         
                     }, failure: { (error) in
                         print(error)
                     })
-
+                    
+                    
                 }, failure: { (error) in
                     print(error)
                 })
@@ -354,6 +364,7 @@ class SearchViewController: UIViewController {
         }, failure: { (error) in
             print(error)
         })
+
     }
 }
 
@@ -462,26 +473,58 @@ extension SearchViewController: UISearchBarDelegate {
 extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        youtubeModels.count
+        if headerTab == .youtubeSelected {
+            return youtubeModels.count
+        }
+        else {
+            return spotifyModels.count
+        }
+        
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: SearchTableViewCell.identifier, for: indexPath) as! SearchTableViewCell
-        cell.delegate = self
-        guard !youtubeModels.isEmpty else {
-            return UITableViewCell()
+        if headerTab == .youtubeSelected {
+            // Youtube cell
+            let cell = tableView.dequeueReusableCell(withIdentifier: SearchTableViewCell.identifier, for: indexPath) as! SearchTableViewCell
+            cell.delegate = self
+            guard !youtubeModels.isEmpty else {
+                return UITableViewCell()
+            }
+            let model = youtubeModels[indexPath.row]
+            cell.configure(with: model)
+            return cell
         }
-        let model = youtubeModels[indexPath.row]
-        cell.configure(with: model)
-        return cell
+        else {
+            // Spotify cell
+            let cell = tableView.dequeueReusableCell(withIdentifier: SpotifyTableViewCell.identifier, for: indexPath) as! SpotifyTableViewCell
+            cell.delegate = self
+            guard !spotifyModels.isEmpty else {
+                return UITableViewCell()
+            }
+            let model = spotifyModels[indexPath.row]
+            cell.configure(with: model)
+            return cell
+        }
+        
+        
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let vc = YoutubePlayerViewController()
-        vc.delegate = self
-        vc.model = youtubeModels[indexPath.row]
-        navigationController?.pushViewController(vc, animated: true)
-        print("cell pressed")
+        if headerTab == .youtubeSelected {
+            let vc = YoutubePlayerViewController()
+            vc.delegate = self
+            vc.model = youtubeModels[indexPath.row]
+            navigationController?.pushViewController(vc, animated: true)
+            print("cell pressed")
+        }
+        else {
+            let vc = SpotifyPlayerViewController()
+            vc.delegate = self
+            vc.model = spotifyModels[indexPath.row]
+            navigationController?.pushViewController(vc, animated: true)
+            print("cell pressed")
+        }
+        
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -516,18 +559,16 @@ extension SearchViewController: YoutubeSpotifyHeaderViewDelegate {
     func didTapYoutubeButton() {
         // Open Youtube search results
         headerTab = .youtubeSelected
+        tableView.reloadData()
         
         print(spotifyModels)
     }
     
     func didTapSpotifyButton() {
         // Open Spotify search results
-        
-        // Set state
         headerTab = .spotifySelected
+        tableView.reloadData()
         
-        getSpotifyData(with: "Leon Vynehall")
-    
     }
 }
 
@@ -635,15 +676,35 @@ extension SearchViewController: YoutubePlayerViewControllerDelegate {
             
             self.addToLibrary(at: indexPath)
         }
-   
+        
     }
     
 }
+
+// MARK:- SearchHistoryViewControllerDelegate
 
 extension SearchViewController: SearchHistoryViewControllerDelegate {
     func didTapSearchHistoryResult(with text: String) {
         searchBar.text = text
         query(with: text)
+    }
+    
+    
+}
+
+// MARK:- SpotifyMoreButtonDelegate
+
+extension SearchViewController: SpotifyMoreButtonDelegate {
+    func didTapSpotifyMoreButton(cell: SpotifyTableViewCell) {
+        print("Tapped Spotify cell more button")
+    }
+}
+
+// MARK:- SpotifyPlayerViewControllerDelegate
+
+extension SearchViewController: SpotifyPlayerViewControllerDelegate {
+    func didTapSPAddToLibraryButton(isInLibrary: Bool, model: SpotifyTrackModel?) {
+        print("Tapped Spotify player more button")
     }
     
     
