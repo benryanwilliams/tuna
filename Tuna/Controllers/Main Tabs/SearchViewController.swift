@@ -311,6 +311,7 @@ class SearchViewController: UIViewController {
             
             // Get the tracks via pagingObject.items
             for item in pagingObject.items {
+                print(item)
                 
                 guard let artist = item.artists[0].name,
                       let title = item.name,
@@ -325,13 +326,13 @@ class SearchViewController: UIViewController {
                 }
                 
                 // Get track information
-                _ = Spartan.getTrack(id: item.id as! String, market: .gb, success: { (track) in
+                _ = Spartan.getTrack(id: item.id as! String, success: { (track) in
                     
                     // Get album id of track
                     let albumId = track.id as! String
                     
                     // Get image for track
-                    _ = Spartan.getAlbum(id: albumId, market: .gb, success: { (album) in
+                    _ = Spartan.getAlbum(id: albumId, success: { (album) in
                         guard let thumbnail = album.images.first?.url else {
                             return
                         }

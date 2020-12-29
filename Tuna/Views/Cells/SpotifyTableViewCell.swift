@@ -131,7 +131,7 @@ class SpotifyTableViewCell: UITableViewCell {
         titleLabel.frame = CGRect(
             x: thumbnailImageView.right + bufferSize,
             y: bufferSize / 2,
-            width: contentView.width - (bufferSize * 5.5) - thumbnailImageView.width - spotifyMoreButton.width,
+            width: contentView.width - (bufferSize * 3) - thumbnailImageView.width - spotifyMoreButton.width,
             height: (contentView.height - (bufferSize * 2)) / 2
         )
         titleLabel.sizeToFit()
@@ -139,14 +139,14 @@ class SpotifyTableViewCell: UITableViewCell {
         artistLabel.frame = CGRect(
             x: thumbnailImageView.right + bufferSize,
             y: titleLabel.bottom,
-            width: contentView.width - (bufferSize * 5.5) - thumbnailImageView.width - spotifyMoreButton.width,
+            width: contentView.width - (bufferSize * 3) - thumbnailImageView.width - spotifyMoreButton.width,
             height: (contentView.height - (bufferSize * 2)) / 4
         )
         
         durationLabel.frame = CGRect(
             x: thumbnailImageView.right + bufferSize,
             y: artistLabel.bottom,
-            width: contentView.width - (bufferSize * 5.5) - thumbnailImageView.width - spotifyMoreButton.width,
+            width: contentView.width - (bufferSize * 3) - thumbnailImageView.width - spotifyMoreButton.width,
             height: (contentView.height - (bufferSize * 2)) / 4
         )
     }

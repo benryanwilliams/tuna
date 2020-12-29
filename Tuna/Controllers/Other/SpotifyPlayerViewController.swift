@@ -22,21 +22,69 @@ class SpotifyPlayerViewController: UIViewController {
     public var model: SpotifyTrackModel?
     
     public var isInLibrary = false
+    public var isPlaying = false
     
     // MARK:- Create UI
     
-    private let playerView: UIView = {
-        let view = UIView()
+    private let albumImageView: UIImageView = {
+        let view = UIImageView()
         return view
     }()
     
     private let titleLabel: UILabel = {
        let label = UILabel()
         label.textColor = .label
-        label.font = .systemFont(ofSize: 19, weight: .semibold)
-        label.textAlignment = .center
+        label.font = .systemFont(ofSize: 24, weight: .semibold)
         return label
         
+    }()
+    
+    private let artistLabel: UILabel = {
+       let label = UILabel()
+        label.textColor = .tunaGreen
+        label.font = .systemFont(ofSize: 22, weight: .semibold)
+        return label
+    }()
+    
+    private let timerSlider: UISlider = {
+       let slider = UISlider()
+        return slider
+    }()
+    
+    private let playButton: UIButton = {
+       let button = UIButton()
+        button.setImage(UIImage(systemName: "play"), for: .normal)
+        button.imageView?.tintColor = .label
+        button.imageView?.contentMode = .scaleAspectFit
+        button.contentVerticalAlignment = .fill
+        button.contentHorizontalAlignment = .fill
+        button.clipsToBounds = true
+        button.backgroundColor = .systemBackground
+        return button
+    }()
+    
+    private let rewindButton: UIButton = {
+       let button = UIButton()
+        button.setImage(UIImage(systemName: "gobackward.15"), for: .normal)
+        button.imageView?.tintColor = .label
+        button.imageView?.contentMode = .scaleAspectFit
+        button.contentVerticalAlignment = .fill
+        button.contentHorizontalAlignment = .fill
+        button.clipsToBounds = true
+        button.backgroundColor = .systemBackground
+        return button
+    }()
+    
+    private let forwardButton: UIButton = {
+       let button = UIButton()
+        button.setImage(UIImage(systemName: "goforward.15"), for: .normal)
+        button.imageView?.tintColor = .label
+        button.imageView?.contentMode = .scaleAspectFit
+        button.contentVerticalAlignment = .fill
+        button.contentHorizontalAlignment = .fill
+        button.clipsToBounds = true
+        button.backgroundColor = .systemBackground
+        return button
     }()
     
     private let addToLibraryButton: UIButton = {
@@ -76,12 +124,26 @@ class SpotifyPlayerViewController: UIViewController {
         configureAddToLibraryButton()
         configureCopyLinkButton()
         configureTitle()
+        configureArtist()
+        configurePlayButton()
+        configureSlider()
+        
+        
+        view.addSubview(rewindButton)
+        view.addSubview(forwardButton)
     }
     
     // MARK:- Config
     
     private func configurePlayerView() {
-        view.addSubview(playerView)
+        view.addSubview(albumImageView)
+        guard let imageUrlString = model?.thumbnail else {
+            return
+        }
+        guard let imageUrl = URL(string: imageUrlString) else {
+            return
+        }
+        albumImageView.sd_setImage(with: imageUrl, completed: nil)
         
     }
     
@@ -109,6 +171,25 @@ class SpotifyPlayerViewController: UIViewController {
         titleLabel.text = model?.title
     }
     
+    private func configureArtist() {
+        view.addSubview(artistLabel)
+        artistLabel.text = model?.artist
+    }
+    
+    private func configureSlider() {
+        view.addSubview(timerSlider)
+    }
+    
+    private func configurePlayButton() {
+        view.addSubview(playButton)
+        if isPlaying == false {
+            playButton.setImage(UIImage(systemName: "play"), for: .normal)
+        }
+        else {
+            playButton.setImage(UIImage(systemName: "pause"), for: .normal)
+        }
+    }
+    
     // MARK:- Actions
     
     @objc private func didTapSPAddToLibraryButton() {
@@ -128,39 +209,78 @@ class SpotifyPlayerViewController: UIViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
-        let videoHeight = view.width * 720 / 1280
-        let bufferSize: CGFloat = 25
-        let buttonSize: CGFloat = 36
+        let bufferSize: CGFloat = 15
+        let transportBufferSize: CGFloat = 25
+        let playButtonSize: CGFloat = 50
+        let backButtonSize: CGFloat = 40
+        let linkButtonSize: CGFloat = 30
+        let imageSize = view.width - (bufferSize * 4)
         
-        titleLabel.frame = CGRect(
-            x: 0,
-            y: ((view.height - addToLibraryButton.height - videoHeight - bufferSize) / 3) - 20 - bufferSize,
-            width: view.width,
-            height: 20
+        albumImageView.frame = CGRect(
+            x: bufferSize * 2,
+            y: bufferSize,
+            width: imageSize,
+            height: imageSize
         )
         
-        playerView.frame = CGRect(
-            x: 0,
-            y: (view.height - addToLibraryButton.height - videoHeight - bufferSize) / 3,
-            width: view.width,
-            height: videoHeight
+        titleLabel.frame = CGRect(
+            x: bufferSize * 2,
+            y: albumImageView.bottom + bufferSize,
+            width: imageSize,
+            height: 30
+        )
+        
+        artistLabel.frame = CGRect(
+            x: bufferSize * 2,
+            y: titleLabel.bottom,
+            width: imageSize,
+            height: 30
+        )
+        
+        timerSlider.frame = CGRect(
+            x: bufferSize * 2,
+            y: artistLabel.bottom + bufferSize,
+            width: imageSize,
+            height: 30
+        )
+        
+        playButton.frame = CGRect(
+            x: (view.width / 2) - (playButtonSize / 2),
+            y: timerSlider.bottom + bufferSize,
+            width: playButtonSize,
+            height: playButtonSize
+        )
+        
+        rewindButton.frame = CGRect(
+            x: playButton.left - transportBufferSize - playButtonSize,
+            y: timerSlider.bottom + bufferSize,
+            width: backButtonSize,
+            height: backButtonSize
+        )
+        
+        copyLinkButton.frame = CGRect(
+            x: rewindButton.left - transportBufferSize - linkButtonSize,
+            y: timerSlider.bottom + bufferSize,
+            width: linkButtonSize,
+            height: linkButtonSize
+        )
+        copyLinkButton.layer.cornerRadius = 8.0
+        
+        forwardButton.frame = CGRect(
+            x: playButton.right + transportBufferSize,
+            y: timerSlider.bottom + bufferSize,
+            width: backButtonSize,
+            height: backButtonSize
         )
         
         addToLibraryButton.frame = CGRect(
-            x: view.right - ((buttonSize + bufferSize) * 2),
-            y: playerView.bottom + bufferSize,
-            width: buttonSize,
-            height: buttonSize
+            x: forwardButton.right + transportBufferSize,
+            y: timerSlider.bottom + bufferSize,
+            width: linkButtonSize,
+            height: linkButtonSize
         )
         addToLibraryButton.layer.cornerRadius = 8.0
         
-        copyLinkButton.frame = CGRect(
-            x: view.right - buttonSize - bufferSize,
-            y: playerView.bottom + bufferSize,
-            width: buttonSize,
-            height: buttonSize
-        )
-        copyLinkButton.layer.cornerRadius = 8.0
     }
     
 }
