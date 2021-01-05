@@ -35,7 +35,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/benryanwilliams/tuna">
-    <img src="Tuna/Assets.xcassets/AppIcon.appiconset/1024.png" alt="Logo" width="80" height="80">
+    <img src="Tuna/Views/Assets.xcassets/AppIcon.appiconset/1024.png" alt="Logo" width="80" height="80">
   </a>
 
   <h3 align="center">Tuna (iOS)</h3>
