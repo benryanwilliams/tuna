@@ -24,6 +24,12 @@ class SpotifyPlayerViewController: UIViewController {
     public var isInLibrary = false
     public var isPlaying = false
     
+    // MARK:- Player
+    var player: MusicPlayer?
+    var appRemote: SPTAppRemote? {
+        get { return (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.appRemote }
+    }
+    
     // MARK:- Create UI
     
     private let albumImageView: UIImageView = {
@@ -32,7 +38,7 @@ class SpotifyPlayerViewController: UIViewController {
     }()
     
     private let titleLabel: UILabel = {
-       let label = UILabel()
+        let label = UILabel()
         label.textColor = .label
         label.font = .systemFont(ofSize: 24, weight: .semibold)
         return label
@@ -40,19 +46,19 @@ class SpotifyPlayerViewController: UIViewController {
     }()
     
     private let artistLabel: UILabel = {
-       let label = UILabel()
+        let label = UILabel()
         label.textColor = .tunaGreen
         label.font = .systemFont(ofSize: 22, weight: .semibold)
         return label
     }()
     
     private let timerSlider: UISlider = {
-       let slider = UISlider()
+        let slider = UISlider()
         return slider
     }()
     
     private let playButton: UIButton = {
-       let button = UIButton()
+        let button = UIButton()
         button.setImage(UIImage(systemName: "play"), for: .normal)
         button.imageView?.tintColor = .label
         button.imageView?.contentMode = .scaleAspectFit
@@ -64,7 +70,7 @@ class SpotifyPlayerViewController: UIViewController {
     }()
     
     private let rewindButton: UIButton = {
-       let button = UIButton()
+        let button = UIButton()
         button.setImage(UIImage(systemName: "gobackward.15"), for: .normal)
         button.imageView?.tintColor = .label
         button.imageView?.contentMode = .scaleAspectFit
@@ -76,7 +82,7 @@ class SpotifyPlayerViewController: UIViewController {
     }()
     
     private let forwardButton: UIButton = {
-       let button = UIButton()
+        let button = UIButton()
         button.setImage(UIImage(systemName: "goforward.15"), for: .normal)
         button.imageView?.tintColor = .label
         button.imageView?.contentMode = .scaleAspectFit
@@ -88,7 +94,7 @@ class SpotifyPlayerViewController: UIViewController {
     }()
     
     private let addToLibraryButton: UIButton = {
-       let button = UIButton()
+        let button = UIButton()
         button.setImage(UIImage(systemName: "folder.badge.plus"), for: .normal)
         button.imageView?.tintColor = .secondaryLabel
         button.imageView?.contentMode = .scaleAspectFit
@@ -100,7 +106,7 @@ class SpotifyPlayerViewController: UIViewController {
     }()
     
     private let copyLinkButton: UIButton = {
-       let button = UIButton()
+        let button = UIButton()
         button.setImage(UIImage(systemName: "link"), for: .normal)
         button.imageView?.tintColor = .secondaryLabel
         button.imageView?.contentMode = .scaleAspectFit
@@ -184,6 +190,10 @@ class SpotifyPlayerViewController: UIViewController {
         view.addSubview(playButton)
         if isPlaying == false {
             playButton.setImage(UIImage(systemName: "play"), for: .normal)
+            guard let urlString = model?.url else {
+                return
+            }
+            playTrackFrom(urlString: urlString)
         }
         else {
             playButton.setImage(UIImage(systemName: "pause"), for: .normal)
@@ -202,6 +212,14 @@ class SpotifyPlayerViewController: UIViewController {
         let pasteboard = UIPasteboard.general
         pasteboard.string = model?.url
     }
+    
+    func playTrackFrom(urlString: String) {
+        let musicPlayer = MusicPlayer()
+        player = musicPlayer
+        player?.initPlayer(url: urlString)
+        player?.play()
+    }
+    
     
     
     // MARK:- viewDidLayoutSubviews
