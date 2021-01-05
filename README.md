@@ -34,23 +34,23 @@
 <!-- PROJECT LOGO -->
 <br />
 <p align="center">
-  <a href="https://github.com/benryanwilliams/chess-clock">
-    <img src="Chess-Clock/Assets.xcassets/AppIcon.appiconset/1024.png" alt="Logo" width="80" height="80">
+  <a href="https://github.com/benryanwilliams/tuna">
+    <img src="Tuna/Assets.xcassets/AppIcon.appiconset/1024.png" alt="Logo" width="80" height="80">
   </a>
 
-  <h3 align="center">Chess Clock (iOS)</h3>
+  <h3 align="center">Tuna (iOS)</h3>
 
   <p align="center">
-    A simple two-player countdown timer with adjustable time and increments.
+    Play music from both Spotify and Youtube in one app and keep the songs in a single playlist.
     <br />
-    <a href="https://github.com/benryanwilliams/chess-clock"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/benryanwilliams/tuna"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/benryanwilliams/chess-clock">View Demo</a>
+    <a href="https://github.com/benryanwilliams/tuna">View Demo</a>
     ·
-    <a href="https://github.com/benryanwilliams/chess-clock/issues">Report Bug</a>
+    <a href="https://github.com/benryanwilliams/tuna/issues">Report Bug</a>
     ·
-    <a href="https://github.com/benryanwilliams/chess-clock/issues">Request Feature</a>
+    <a href="https://github.com/benryanwilliams/tuna/issues">Request Feature</a>
   </p>
 </p>
 
